@@ -22,6 +22,8 @@ using namespace std;
 GLOBALS
 ///////////////////////////////////////////////////////////////////////////////*/
 
+//Start
+
 GLFWwindow *window = NULL;
 int windowWidth = 800;
 int windowHeight = 600;
