@@ -22,13 +22,4 @@
   <tr>
     <td><a href="https://github.com/nothings/stb">stb_image & stb_image_write</a></td>
   </tr>
-    <tr>
-    <td><a href="">Empty</a></td>
-  </tr>
-  <tr>
-    <td><a href="">Empty</a></td>
-  </tr>
-  <tr>
-    <td><a href="">Empty</a></td>
-  </tr>
 </table>
