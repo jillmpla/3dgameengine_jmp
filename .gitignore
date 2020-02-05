@@ -4,7 +4,6 @@
 
 /.vs
 /out/build/x64-Debug
-LICENSE
 
 # Prerequisites
 *.d

@@ -15,6 +15,7 @@
 #include "MeshGL.hpp"
 #include "Camera.hpp"
 #include "Light.hpp"
+#include "SceneGraphNode.hpp"
 
 using namespace std;
 
