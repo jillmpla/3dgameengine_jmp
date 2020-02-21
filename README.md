@@ -1,3 +1,3 @@
 # 3dgameengine_jillplatts
 
-todo (use CMakeLists.txt)
+todo - fill out readme (use CMakeLists.txt)
