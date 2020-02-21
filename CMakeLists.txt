@@ -116,10 +116,18 @@ link_directories(${MASTER_DEPEND}/lib)
 #####################################
 # Get general sources
 #####################################
-include_directories(".")
 
-# get all *.cpp, .hpp, .h files recursively
-file(GLOB_RECURSE GENERAL_SOURCES ${PROJECT_SOURCE_DIR}/*.cpp ${PROJECT_SOURCE_DIR}/*.hpp ${PROJECT_SOURCE_DIR}/*.h)
+file(GLOB GENERAL_SOURCES
+       ${PROJECT_SOURCE_DIR}/*.cpp
+       ${PROJECT_SOURCE_DIR}/*.hpp
+       ${PROJECT_SOURCE_DIR}/*.h
+       ${PROJECT_SOURCE_DIR}/Base/*.cpp
+       ${PROJECT_SOURCE_DIR}/Base/*.hpp
+       ${PROJECT_SOURCE_DIR}/Base/*.h
+       ${PROJECT_SOURCE_DIR}/dearimgui/*.cpp
+       ${PROJECT_SOURCE_DIR}/dearimgui/*.hpp
+       ${PROJECT_SOURCE_DIR}/dearimgui/*.h
+       ${PROJECT_SOURCE_DIR}/Objects/)
 
 #####################################
 # Set general libraries
