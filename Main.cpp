@@ -277,7 +277,7 @@ int main(int argc, char **argv) {
 	
 	// Create our GLFW window
 	window = glfwCreateWindow(	windowWidth, windowHeight, 
-								"It's Lit",
+								"3D Game Engine",
 								NULL, NULL);
 
 	// Were we able to make it?
