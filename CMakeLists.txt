@@ -31,6 +31,9 @@ set(CMAKE_PREFIX_PATH ${MASTER_DEPEND} ${CMAKE_PREFIX_PATH})
 # - Assimp (static)
 # - stb_image
 # - stb_image_write
+# INCLUDES -
+# - DearImgui - https://github.com/ocornut/imgui
+# - json.hpp - https://github.com/nlohmann/json
 #####################################
 
 #####################################

@@ -103,6 +103,22 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			modelGL->rotate(-5.0f, glm::vec3(0, 0, 1)); //rotate modelGL by negative 5 degrees, z axis
 			break;
 
+		case GLFW_KEY_E:
+			modelGL->rotate(5.0f, glm::vec3(1, 0, 0)); //rotate modelGL by positive 5 degrees, x axis
+			break;
+
+		case GLFW_KEY_R:
+			modelGL->rotate(-5.0f, glm::vec3(1, 0, 0)); //rotate modelGL by negative 5 degrees, x axis
+			break;
+
+		case GLFW_KEY_T:
+			modelGL->rotate(5.0f, glm::vec3(0, 1, 0)); //rotate modelGL by positive 5 degrees, y axis
+			break;
+
+		case GLFW_KEY_Y:
+			modelGL->rotate(-5.0f, glm::vec3(0, 1, 0)); //rotate modelGL by negative 5 degrees, y axis
+			break;
+
 		case GLFW_KEY_I:
 			modelGL->translate(glm::vec3(0, TRANSLATION_INC, 0)); //translate modelGL by positive TRANSLATION_INC in Y
 			break;
@@ -238,7 +254,7 @@ int main(int argc, char **argv) {
 
 	// If an argument is passed in, load a 3D file.
 	// Otherwise, create a simple quad.
-	string modelFilename = "../Objects/teapot.obj";
+	string modelFilename = "../Objects/teddy.obj";
 	if (argc >= 2) {
 		modelFilename = string(argv[1]);
 	}
