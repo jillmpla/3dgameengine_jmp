@@ -129,8 +129,7 @@ file(GLOB GENERAL_SOURCES
        ${PROJECT_SOURCE_DIR}/Base/*.h
        ${PROJECT_SOURCE_DIR}/dearimgui/*.cpp
        ${PROJECT_SOURCE_DIR}/dearimgui/*.hpp
-       ${PROJECT_SOURCE_DIR}/dearimgui/*.h
-       ${PROJECT_SOURCE_DIR}/Objects/)
+       ${PROJECT_SOURCE_DIR}/dearimgui/*.h)
 
 #####################################
 # Set general libraries
