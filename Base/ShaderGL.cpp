@@ -1,5 +1,5 @@
 #include "ShaderGL.hpp"
-#include "../Utilities.h"
+#include "Utilities.h"
 #include <iostream>
 #include <fstream>
 #include <algorithm>

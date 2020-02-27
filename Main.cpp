@@ -14,41 +14,41 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
 /*/////////////////////////////////////////////////////////////////////////////*/
-#include "Base/ShaderGL.hpp"
-#include "Base/ModelLoader.hpp"
-#include "Base/MeshShaderGL.hpp"
-#include "Base/ModelGL.hpp"
-#include "Base/MeshGL.hpp"
-#include "Base/Camera.hpp"
-#include "Base/Light.hpp"
+#include "base/ShaderGL.hpp"
+#include "base/ModelLoader.hpp"
+#include "base/MeshShaderGL.hpp"
+#include "base/ModelGL.hpp"
+#include "base/MeshGL.hpp"
+#include "base/Camera.hpp"
+#include "base/Light.hpp"
 /*Dear ImGui*/
-#include "dearimgui/imgui.h"
-#include "dearimgui/imgui_impl_glfw.h"
-#include "dearimgui/imgui_impl_opengl3.h"
-#include "dearimgui/imconfig.h"
-#include "dearimgui/imgui_internal.h"
-#include "dearimgui/imstb_rectpack.h"
-#include "dearimgui/imstb_textedit.h"
-#include "dearimgui/imstb_truetype.h"
+#include "libs/dearimgui/imgui.h"
+#include "libs/dearimgui/imgui_impl_glfw.h"
+#include "libs/dearimgui/imgui_impl_opengl3.h"
+#include "libs/dearimgui/imconfig.h"
+#include "libs/dearimgui/imgui_internal.h"
+#include "libs/dearimgui/imstb_rectpack.h"
+#include "libs/dearimgui/imstb_textedit.h"
+#include "libs/dearimgui/imstb_truetype.h"
 /*JSON*/
-#include "json.hpp"
+#include "libs/json.hpp"
 using json = nlohmann::json;
 /*TinyGLTF*/
 #define TINYGLTF_IMPLEMENTATION
-#include "tiny_gltf.h"
+#include "libs/tiny_gltf.h"
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "libs/stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
+#include "libs/stb_image_write.h"
 /*PXRender* - try this out...maybe or delete
 #define PX_RENDER
-#include "px_render.h"
+#include "libs/px_render.h"
 #define PX_RENDER_GLTF_IMPLEMENTATION
-#include "px_render_gltf.h"
+#include "libs/px_render_gltf.h"
 #define PX_RENDER_IMGUI_IMPLEMENTATION
-#include "px_render_imgui.h"*/
+#include "libs/px_render_imgui.h"*/
 /*imfilebrowser*/
-#include "imfilebrowser.h"
+#include "libs/imfilebrowser.h"
 
 using namespace std;
 
@@ -290,12 +290,12 @@ int main(int argc, char **argv) {
 
 	// imgui-filebrowser - create a file browser instance
 	ImGui::FileBrowser fileDialog;
-	fileDialog.SetTitle("Load Scene");
+	fileDialog.SetTitle("Load .gltf or .glb");
 	fileDialog.SetTypeFilters({ ".gltf", ".glb" });
 
 	// If an argument is passed in, load a 3D file.
 	// Otherwise, create a simple quad.
-	string modelFilename = "../Objects/teddy.obj";
+	string modelFilename = "../objs/teddy.obj";
 	if (argc >= 2) {
 		modelFilename = string(argv[1]);
 	}
@@ -334,7 +334,7 @@ int main(int argc, char **argv) {
 
 	// Change window's icon, so it's more Beary-themed
 	GLFWimage images[1];
-	images[0].pixels = stbi_load("../teddy-bear-icon.png", &images[0].width, &images[0].height, 0, 4);
+	images[0].pixels = stbi_load("../pngs/teddy-bear-icon.png", &images[0].width, &images[0].height, 0, 4);
 	glfwSetWindowIcon(window, 1, images);
 	stbi_image_free(images[0].pixels);
 
@@ -414,7 +414,7 @@ int main(int argc, char **argv) {
 	cout << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 
 	// Load shader program
-	shader = new MeshShaderGL("../Basic.vs", "../Basic.ps", true);
+	shader = new MeshShaderGL("../base/Basic.vs", "../base/Basic.ps", true);
 
 	// Create/Get mesh data	
 	ModelData *modelData = NULL;

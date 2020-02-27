@@ -29,10 +29,11 @@ set(CMAKE_PREFIX_PATH ${MASTER_DEPEND} ${CMAKE_PREFIX_PATH})
 # - GLEW (static)
 # - GLM
 # - Assimp (static)
-# INCLUDES -
+# INTERNALLY INCLUDES -
 # - DearImgui - https://github.com/ocornut/imgui
 # - json.hpp - https://github.com/nlohmann/json
 # - tiny_gltf.h - https://github.com/syoyo/tinygltf
+# - imfilebrowser.h - https://github.com/AirGuanZ/imgui-filebrowser
 # - stb_image
 # - stb_image_write
 #####################################
@@ -128,9 +129,12 @@ file(GLOB GENERAL_SOURCES
        ${PROJECT_SOURCE_DIR}/Base/*.cpp
        ${PROJECT_SOURCE_DIR}/Base/*.hpp
        ${PROJECT_SOURCE_DIR}/Base/*.h
-       ${PROJECT_SOURCE_DIR}/dearimgui/*.cpp
-       ${PROJECT_SOURCE_DIR}/dearimgui/*.hpp
-       ${PROJECT_SOURCE_DIR}/dearimgui/*.h)
+       ${PROJECT_SOURCE_DIR}/libs/*.cpp
+       ${PROJECT_SOURCE_DIR}/libs/*.hpp
+       ${PROJECT_SOURCE_DIR}/libs/*.h
+       ${PROJECT_SOURCE_DIR}/libs/dearimgui/*.cpp
+       ${PROJECT_SOURCE_DIR}/libs/dearimgui/*.hpp
+       ${PROJECT_SOURCE_DIR}/libs/dearimgui/*.h)
 
 #####################################
 # Set general libraries
