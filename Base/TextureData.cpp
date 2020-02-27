@@ -1,7 +1,6 @@
 #include "TextureData.hpp"
 #include <iostream>
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include "../stb_image.h"
 
 TextureData::TextureData(std::string texturePath) {
 	// Save path information

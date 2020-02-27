@@ -29,11 +29,12 @@ set(CMAKE_PREFIX_PATH ${MASTER_DEPEND} ${CMAKE_PREFIX_PATH})
 # - GLEW (static)
 # - GLM
 # - Assimp (static)
-# - stb_image
-# - stb_image_write
 # INCLUDES -
 # - DearImgui - https://github.com/ocornut/imgui
 # - json.hpp - https://github.com/nlohmann/json
+# - tiny_gltf.h - https://github.com/syoyo/tinygltf
+# - stb_image
+# - stb_image_write
 #####################################
 
 #####################################

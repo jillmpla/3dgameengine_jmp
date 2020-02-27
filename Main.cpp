@@ -1,6 +1,9 @@
 //C++
+#include <cstdio>
 #include <iostream>
+#include <fstream>
 #include <stdio.h>
+#include <stdint.h>
 #include <cstring>
 #include <thread>
 #include <algorithm>
@@ -30,6 +33,22 @@
 /*JSON*/
 #include "json.hpp"
 using json = nlohmann::json;
+/*TinyGLTF*/
+#define TINYGLTF_IMPLEMENTATION
+#include "tiny_gltf.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+/*PXRender* - try this out...maybe or delete
+#define PX_RENDER
+#include "px_render.h"
+#define PX_RENDER_GLTF_IMPLEMENTATION
+#include "px_render_gltf.h"
+#define PX_RENDER_IMGUI_IMPLEMENTATION
+#include "px_render_imgui.h"*/
+/*imfilebrowser*/
+#include "imfilebrowser.h"
 
 using namespace std;
 
@@ -76,6 +95,20 @@ float shiny = 10.0;
 
 MeshShaderGL *shader;
 
+//tinyglft///////////////////////////////////////////////////////////////////////
+static std::string GetFilePathExtension(const std::string& FileName) {
+	if (FileName.find_last_of(".") != std::string::npos)
+		return FileName.substr(FileName.find_last_of(".") + 1);
+	return "";
+}
+
+bool ret = false;
+tinygltf::Model model;
+tinygltf::TinyGLTF loader;
+std::string errp;
+std::string warn;
+std::string ext;
+
 /*///////////////////////////////////////////////////////////////////////////////
 FUNCTIONS - GLFW Callbacks
 ///////////////////////////////////////////////////////////////////////////////*/
@@ -95,7 +128,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		switch (key) {
 
 		case GLFW_KEY_SPACE:
-			modelGL->reset(); //call reset on modelGL
+			modelGL->reset();
 			break;
 			
 		case GLFW_KEY_U:
@@ -202,7 +235,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	}
 }
 
-/*// GLFW mouse movement callback
+// GLFW mouse movement callback
 static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos) {
 	if (firstMouseMove) {
 		mouseX = xpos;
@@ -235,7 +268,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 			leftMouseButtonDown = false;
 		}
 	}
-}*/
+}
 
 // GLFW callback when the window changes size
 void window_size_callback(GLFWwindow* window, int width, int height) {
@@ -254,6 +287,11 @@ FUNCTIONS - Main
 ///////////////////////////////////////////////////////////////////////////////*/
 
 int main(int argc, char **argv) {
+
+	// imgui-filebrowser - create a file browser instance
+	ImGui::FileBrowser fileDialog;
+	fileDialog.SetTitle("Load Scene");
+	fileDialog.SetTypeFilters({ ".gltf", ".glb" });
 
 	// If an argument is passed in, load a 3D file.
 	// Otherwise, create a simple quad.
@@ -279,20 +317,26 @@ int main(int argc, char **argv) {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	const char* glsl_version = "#version 330"; /*OpenGL 3.3, GLSL 330*/
 	
-	// Create our GLFW window
+	// Create GLFW window
 	window = glfwCreateWindow(	windowWidth, windowHeight, 
-								"3D Game Engine",
+								"Beary",
 								NULL, NULL);
 
-	// Were we able to make it?
+	// Check that is was created
 	if (!window) {
 		// Kill GLFW and exit program
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
 
-	// We want to draw to this window, so make the OpenGL context associated with this window our current context.
+	// Draw to this window.
 	glfwMakeContextCurrent(window);
+
+	// Change window's icon, so it's more Beary-themed
+	GLFWimage images[1];
+	images[0].pixels = stbi_load("../teddy-bear-icon.png", &images[0].width, &images[0].height, 0, 4);
+	glfwSetWindowIcon(window, 1, images);
+	stbi_image_free(images[0].pixels);
 
 	// Basically, turning VSync on (so we will wait until the screen is updated once before swapping the back and front buffers
 	glfwSwapInterval(1);
@@ -300,11 +344,11 @@ int main(int argc, char **argv) {
 	// Set our keyboard callback function, so that we can process keyboard input!
 	glfwSetKeyCallback(window, key_callback);
 	
-	//////////////////////////////// Set our mouse callback function for when the mouse MOVES
-	////////////////////////////////glfwSetCursorPosCallback(window, mouse_position_callback);
+	// Set our mouse callback function for when the mouse MOVES
+	glfwSetCursorPosCallback(window, mouse_position_callback);
 
-	/////////////////////////////// Set our mouse BUTTON callback function
-	///////////////////////////////glfwSetMouseButtonCallback(window, mouse_button_callback);
+	// Set our mouse BUTTON callback function
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 	// Set our callback for when the window changes size
 	glfwSetWindowSizeCallback(window, window_size_callback);
@@ -312,12 +356,14 @@ int main(int argc, char **argv) {
 	// Set our callback for when the framebuffer changes size
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	// Hide cursor
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	// Cursor
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	GLFWcursor* cursor = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+	glfwSetCursor(window, cursor);
 	
 	// GLEW setup //
 	
-	// MAC-SPECIFIC: Use the experimental version of GLEW
+	// MAC-SPECIFIC: Some issues occur with using OpenGL core and GLEW; so, we'll use the experimental version of GLEW
 	glewExperimental = true;
 
 	// (Try to) initalize GLEW
@@ -342,18 +388,20 @@ int main(int argc, char **argv) {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-	// Setup Dear ImGui style
+	// Dear ImGui style
 	ImGui::StyleColorsDark();
 
-	// Setup Platform/Renderer bindings
+	// Platform/Renderer bindings
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
-	// Our state
-	bool show_another_window = true;
+	// State
+	bool show_file_load_window = false;
+	bool save_file_load_window = false;
+	bool load_an_obj_file = false;
+	bool edit_obj_color = false;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 	/*/////////////////////////////////////////////////////////////////////////////*/
 
@@ -439,55 +487,151 @@ int main(int argc, char **argv) {
 	shader->setShininess(shiny);
 	shader->setMaterialChoice(0);
 	
+	// Main Dear ImGui window////////////////////////////////////////////////////////////////////////////////////////////////////////
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
-		//io.MousePos = my_mouse_pos;
 
 		// Start the Dear ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		ImGui::SetMouseCursor(ImGuiMouseCursor_None);
-		ImGui:(io.WantCaptureMouse, true);
+		//ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiCond_FirstUseEver);
 
-		/*With previous implementations then only relevant variable to tell who draws the cursor was io.MouseDrawCursor:
-
-		imgui: io.MouseDrawCursor is true
-		glfw : io.MouseDrawCursor is false
-		Now NoMouseCursorChange is also relevant :
-
-		imgui: io.MouseDrawCursor is true and NoMouseCursorChange is false
-		glfw : io.MouseDrawCursor is false and NoMouseCursorChange is true*/
-
-		// 1st window
+		// Main window
 		{
-			static float f = 0.0f;
-			static int counter = 0;
+			//static float f = 0.0f;
 
-			ImGui::Begin("Menu");                                    // Create a window called "Menu" and append into it.
-			ImGui::Text("This is some useful text.");                // Display some text (you can use a format strings too)
-			ImGui::Checkbox("Another Window", &show_another_window); // Edit bools storing our window open/close state
-
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);             // float using a slider from 0.0f to 1.0f
-			ImGui::ColorEdit3("clear color", (float*)&clear_color);  // floats representing a color
-
-			if (ImGui::Button("Button"))                             // Buttons return true when clicked (most widgets return true when edited/activated)
-				counter++;
-			ImGui::SameLine();
-			ImGui::Text("counter = %d", counter);
-
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			ImGui::Begin("Main Menu");
+			ImGui::Text("%.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
+			ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
+			ImGui::Separator();
+			ImGui::Text("Save/Load");
+			if (ImGui::Button("Save .gltf/.glb File")) {
+				save_file_load_window = true;
+			}
+			if (ImGui::Button("Load .gltf/.glb File")) {
+				show_file_load_window = true;
+			}
+			if (ImGui::Button("Load .obj")) {
+				load_an_obj_file = true;
+			}
+			ImGui::Separator();
+			ImGui::Text("Change Background Color");
+			ImGui::ColorEdit3("Color", (float*)&clear_color); 
 			ImGui::End();
 		}
 
-		// 2nd window
-		if (show_another_window)
+		// Edit color of object
+		if (edit_obj_color)
 		{
-			ImGui::Begin("Another Window", &show_another_window);
-			ImGui::Text("Hello from another window!");
-			if (ImGui::Button("Close Me"))
-				show_another_window = false;
+			ImGui::Begin("Load an Object", &edit_obj_color);
+			ImGui::Text("");
+			if (ImGui::Button("Close")) {
+				edit_obj_color = false;
+			}
+			ImGui::End();
+		}
+
+		// Load .obj File
+		if (load_an_obj_file)
+		{
+			ImGui::Begin("Load .obj", &load_an_obj_file);
+			ImGui::Text("");
+			if (ImGui::Button("Close")) {
+				load_an_obj_file = false;
+			}
+			ImGui::End();
+		}
+
+		// .gltf/.glb File Save Window
+		if (save_file_load_window)
+		{
+			ImGui::Begin(".gltf/.glb File Save", &save_file_load_window);
+			ImGui::Text("Save .gltf/.glb File:");
+			if (ImGui::Button("Save File")) {
+				// empty
+			}
+			if (ImGui::Button("Close")) {
+				save_file_load_window = false;
+			}
+			ImGui::End();
+		}
+
+		//.gltf/.glb File Loader Window
+		if (show_file_load_window)
+		{
+			ImGui::Begin(".gltf/.glb File Loader", &show_file_load_window);
+			ImGui::Text("Open .gltf/.glb File:");
+			if (ImGui::Button("Open File"))
+				fileDialog.Open();
+				fileDialog.Display();
+				if (fileDialog.HasSelected())
+				{
+					string fileName = fileDialog.GetSelected().string();
+					ext = GetFilePathExtension(fileName);
+					bool ret = false;
+
+					if (ext == "glb") {
+						// binary glTF - .glb
+						ret = loader.LoadBinaryFromFile(&model, &errp, &warn, fileName);
+
+						std::cout << "loaded .glb file has:\n"
+							<< model.accessors.size() << " accessors\n"
+							<< model.animations.size() << " animations\n"
+							<< model.buffers.size() << " buffers\n"
+							<< model.bufferViews.size() << " bufferViews\n"
+							<< model.materials.size() << " materials\n"
+							<< model.meshes.size() << " meshes\n"
+							<< model.nodes.size() << " nodes\n"
+							<< model.textures.size() << " textures\n"
+							<< model.images.size() << " images\n"
+							<< model.skins.size() << " skins\n"
+							<< model.samplers.size() << " samplers\n"
+							<< model.cameras.size() << " cameras\n"
+							<< model.scenes.size() << " scenes\n"
+							<< model.lights.size() << " lights\n";
+
+					}
+					else {
+						// ASCII glTF - .gltf
+						ret = loader.LoadASCIIFromFile(&model, &errp, &warn, fileName);
+
+						std::cout << "loaded .gltf file has:\n"
+							<< model.accessors.size() << " accessors\n"
+							<< model.animations.size() << " animations\n"
+							<< model.buffers.size() << " buffers\n"
+							<< model.bufferViews.size() << " bufferViews\n"
+							<< model.materials.size() << " materials\n"
+							<< model.meshes.size() << " meshes\n"
+							<< model.nodes.size() << " nodes\n"
+							<< model.textures.size() << " textures\n"
+							<< model.images.size() << " images\n"
+							<< model.skins.size() << " skins\n"
+							<< model.samplers.size() << " samplers\n"
+							<< model.cameras.size() << " cameras\n"
+							<< model.scenes.size() << " scenes\n"
+							<< model.lights.size() << " lights\n";
+
+					}
+
+					if (!warn.empty()) {
+						std::cerr << "glTF parse warning: " << warn << std::endl;
+					}
+
+					if (!errp.empty()) {
+						std::cerr << "glTF parse error: " << errp << std::endl;
+					}
+
+					if (!ret) {
+						std::cerr << "Failed to load glTF: " << fileName << std::endl;
+						return false;
+					}
+					fileDialog.ClearSelected();
+				}
+				if (ImGui::Button("Close")) {
+					show_file_load_window = false;
+				}
 			ImGui::End();
 		}
 
