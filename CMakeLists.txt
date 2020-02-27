@@ -126,16 +126,15 @@ file(GLOB GENERAL_SOURCES
        ${PROJECT_SOURCE_DIR}/*.cpp
        ${PROJECT_SOURCE_DIR}/*.hpp
        ${PROJECT_SOURCE_DIR}/*.h
-       ${PROJECT_SOURCE_DIR}/base/*.cpp
-       ${PROJECT_SOURCE_DIR}/base/*.hpp
-       ${PROJECT_SOURCE_DIR}/base/*.h
+       ${PROJECT_SOURCE_DIR}/core/*.cpp
+       ${PROJECT_SOURCE_DIR}/core/*.hpp
+       ${PROJECT_SOURCE_DIR}/core/*.h
        ${PROJECT_SOURCE_DIR}/libs/*.cpp
        ${PROJECT_SOURCE_DIR}/libs/*.hpp
        ${PROJECT_SOURCE_DIR}/libs/*.h
        ${PROJECT_SOURCE_DIR}/libs/dearimgui/*.cpp
        ${PROJECT_SOURCE_DIR}/libs/dearimgui/*.hpp
-       ${PROJECT_SOURCE_DIR}/libs/dearimgui/*.h
-       ${PROJECT_SOURCE_DIR}/objs/*.obj)
+       ${PROJECT_SOURCE_DIR}/libs/dearimgui/*.h)
 
 #####################################
 # Set general libraries

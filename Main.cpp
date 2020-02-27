@@ -14,13 +14,13 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
 /*/////////////////////////////////////////////////////////////////////////////*/
-#include "base/ShaderGL.hpp"
-#include "base/ModelLoader.hpp"
-#include "base/MeshShaderGL.hpp"
-#include "base/ModelGL.hpp"
-#include "base/MeshGL.hpp"
-#include "base/Camera.hpp"
-#include "base/Light.hpp"
+#include "core/ShaderGL.hpp"
+#include "core/ModelLoader.hpp"
+#include "core/MeshShaderGL.hpp"
+#include "core/ModelGL.hpp"
+#include "core/MeshGL.hpp"
+#include "core/Camera.hpp"
+#include "core/Light.hpp"
 /*Dear ImGui*/
 #include "libs/dearimgui/imgui.h"
 #include "libs/dearimgui/imgui_impl_glfw.h"
@@ -414,7 +414,7 @@ int main(int argc, char **argv) {
 	cout << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 
 	// Load shader program
-	shader = new MeshShaderGL("../base/Basic.vs", "../base/Basic.ps", true);
+	shader = new MeshShaderGL("../core/Basic.vs", "../core/Basic.ps", true);
 
 	// Create/Get mesh data	
 	ModelData *modelData = NULL;
