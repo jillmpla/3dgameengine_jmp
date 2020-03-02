@@ -67,6 +67,12 @@ bool firstMouseMove = true;
 double mouseX = -1;
 double mouseY = -1;
 bool leftMouseButtonDown = false;
+static double cursor_pos_x = 0;
+static double cursor_pos_y = 0;
+static double delta_x = 0;
+static double delta_y = 0;
+
+static int window_drag_active = 0;
 
 ModelGL *modelGL = NULL;
 
@@ -257,7 +263,7 @@ static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos
 	mouseY = ypos;
 }
 
-// GLFW callback for mouse BUTTONS
+/*// GLFW callback for mouse BUTTONS
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
 		if (action == GLFW_PRESS) {
@@ -268,6 +274,21 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 			cout << "MOUSE LEFT UP" << endl;
 			leftMouseButtonDown = false;
 		}
+	}
+}*/
+
+// GLFW callback mouse drag
+static void mouse_button_callback(GLFWwindow* window, int button, int action,
+	int mods) {
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		window_drag_active = 1;
+		double x, y;
+		glfwGetCursorPos(window, &x, &y);
+		cursor_pos_x = floor(x);
+		cursor_pos_y = floor(y);
+	}
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+		window_drag_active = 0;
 	}
 }
 
@@ -446,35 +467,6 @@ int main(int argc, char **argv) {
 			vertices->at(i).color = glm::vec4(pos.x, pos.y, pos.z, 1.0);
 		}		
 	}
-	else {	
-		cout << "Creating mesh from scratch..." << endl;
-
-		// Create the mesh data
-		vector<Vertex> verts;
-		vector<unsigned int> ind;
-
-		// Add four corners
-		verts.push_back(Vertex(glm::vec3(-0.5, -0.5, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0), glm::vec3(0, 0, 1), glm::vec2(0, 0), glm::vec4(1, 0, 0, 1)));
-		verts.push_back(Vertex(glm::vec3(0.5, -0.5, 0.0), glm::vec4(0.0, 1.0, 0.0, 1.0), glm::vec3(0, 0, 1), glm::vec2(0, 0), glm::vec4(1, 0, 0, 1)));
-		verts.push_back(Vertex(glm::vec3(0.5, 0.5, 0.0), glm::vec4(0.0, 0.0, 1.0, 1.0), glm::vec3(0, 0, 1), glm::vec2(0, 0), glm::vec4(1, 0, 0, 1)));
-		verts.push_back(Vertex(glm::vec3(-0.5, 0.5, 0.0), glm::vec4(1.0, 1.0, 1.0, 1.0), glm::vec3(0, 0, 1), glm::vec2(0, 0), glm::vec4(1, 0, 0, 1)));
-
-		// Add indices for two triangles
-		ind.push_back(0);
-		ind.push_back(1);
-		ind.push_back(2);
-
-		ind.push_back(0);
-		ind.push_back(2);
-		ind.push_back(3);
-
-		// Create mesh data
-		MeshData *mesh = new MeshData(verts, ind);
-
-		// Create a simple model and add mesh to it
-		modelData = new ModelData();
-		modelData->addMesh(mesh, 0);
-	}
 
 	modelGL = new ModelGL(modelData);
 
@@ -505,8 +497,6 @@ int main(int argc, char **argv) {
 
 		// Main window
 		{
-			//static float f = 0.0f;
-
 			ImGui::Begin("Main Menu");
 			ImGui::Text("%.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
 			ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
@@ -676,6 +666,16 @@ int main(int argc, char **argv) {
 
 		// Rendering!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		ImGui::Render();
+		if (window_drag_active) {
+			double xpos, ypos;
+			glfwGetCursorPos(window, &xpos, &ypos);
+			delta_x = xpos - cursor_pos_x;
+			delta_y = ypos - cursor_pos_y;
+
+			int x, y;
+			glfwGetWindowPos(window, &x, &y);
+			glfwSetWindowPos(window, x + delta_x, y + delta_y);
+		}
 		camera->updateBufferSize(framebufferWidth, framebufferHeight);
 		shader->setViewAndProjection(camera);
 		shader->setLight(light);
