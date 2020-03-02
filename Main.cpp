@@ -69,6 +69,7 @@ double mouseY = -1;
 bool leftMouseButtonDown = false;
 
 ModelGL *modelGL = NULL;
+
 const float TRANSLATION_INC = 0.1;
 
 const float CAMERA_WALK_SPEED = .1f;
@@ -288,10 +289,14 @@ FUNCTIONS - Main
 
 int main(int argc, char **argv) {
 
-	// imgui-filebrowser - create a file browser instance
+	// imgui-filebrowser - create file browser instances
 	ImGui::FileBrowser fileDialog;
 	fileDialog.SetTitle("Load .gltf or .glb");
 	fileDialog.SetTypeFilters({ ".gltf", ".glb" });
+
+	ImGui::FileBrowser fileDialog1;
+	fileDialog1.SetTitle("Load .obj");
+	fileDialog1.SetTypeFilters({ ".obj" });
 
 	// If an argument is passed in, load a 3D file.
 	// Otherwise, create a simple quad.
@@ -537,7 +542,41 @@ int main(int argc, char **argv) {
 		if (load_an_obj_file)
 		{
 			ImGui::Begin("Load .obj", &load_an_obj_file);
-			ImGui::Text("");
+			ImGui::Text("Open .obj File:");
+			if (ImGui::Button("Open File"))
+				fileDialog1.Open();
+				fileDialog1.Display();
+				if (fileDialog1.HasSelected())
+				{//////////////////////////////////////////////////////////////////////////////////make new class for this
+					std::string fileName = fileDialog1.GetSelected().string();
+					ext = GetFilePathExtension(fileName);
+					if (ext == "obj") {
+						std::cout << fileName << '\n';
+						string modelFilename1 = fileName;
+						shader = new MeshShaderGL("../core/Basic.vs", "../core/Basic.ps", true);
+						ModelData* modelData1 = NULL;
+						modelData1 = loadModel(modelFilename1);
+							if (!modelData1) {
+								cout << "ERROR: Failed to set up model data." << endl;
+								glfwTerminate();
+								exit(EXIT_FAILURE);
+							}
+							vector<Vertex>* vertices = modelData1->getMesh(0)->getVertices();
+							for (int i = 0; i < vertices->size(); i++) {
+								glm::vec3 pos = vertices->at(i).pos;
+								pos += 1.0;
+								pos /= 2.0;
+								vertices->at(i).color = glm::vec4(pos.x, pos.y, pos.z, 1.0);
+							}
+							modelGL = new ModelGL(modelData1);
+							delete modelData1;
+							glEnable(GL_DEPTH_TEST);
+							shader->activate();
+							shader->setShininess(shiny);
+							shader->setMaterialChoice(0);
+					}
+				}
+
 			if (ImGui::Button("Close")) {
 				load_an_obj_file = false;
 			}
