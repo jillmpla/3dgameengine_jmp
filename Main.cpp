@@ -1,326 +1,19 @@
-//C++
-#include <cstdio>
-#include <iostream>
-#include <fstream>
-#include <stdio.h>
-#include <stdint.h>
-#include <cstring>
-#include <thread>
-#include <algorithm>
-#include <vector>
-/*/////////////////////////////////////////////////////////////////////////////*/
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#define GLM_ENABLE_EXPERIMENTAL
-#include "glm/gtx/string_cast.hpp"
-/*/////////////////////////////////////////////////////////////////////////////*/
-#include "core/ShaderGL.hpp"
-#include "core/ModelLoader.hpp"
-#include "core/MeshShaderGL.hpp"
-#include "core/ModelGL.hpp"
-#include "core/MeshGL.hpp"
-#include "core/Camera.hpp"
-#include "core/Light.hpp"
-/*Dear ImGui*/
-#include "libs/dearimgui/imgui.h"
-#include "libs/dearimgui/imgui_impl_glfw.h"
-#include "libs/dearimgui/imgui_impl_opengl3.h"
-#include "libs/dearimgui/imconfig.h"
-#include "libs/dearimgui/imgui_internal.h"
-#include "libs/dearimgui/imstb_rectpack.h"
-#include "libs/dearimgui/imstb_textedit.h"
-#include "libs/dearimgui/imstb_truetype.h"
-/*JSON*/
-#include "libs/json.hpp"
-using json = nlohmann::json;
-/*TinyGLTF*/
-#define TINYGLTF_IMPLEMENTATION
-#include "libs/tiny_gltf.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "libs/stb_image.h"
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "libs/stb_image_write.h"
-/*PXRender* - try this out...maybe or delete
-#define PX_RENDER
-#include "libs/px_render.h"
-#define PX_RENDER_GLTF_IMPLEMENTATION
-#include "libs/px_render_gltf.h"
-#define PX_RENDER_IMGUI_IMPLEMENTATION
-#include "libs/px_render_imgui.h"*/
-/*imfilebrowser*/
-#include "libs/imfilebrowser.h"
-
-using namespace std;
+#include "Main.hpp"
 
 /*///////////////////////////////////////////////////////////////////////////////
-GLOBALS
-///////////////////////////////////////////////////////////////////////////////*/
-
-GLFWwindow *window = NULL;
-int windowWidth = 1920;
-int windowHeight = 1080;
-
-int framebufferWidth = windowWidth;
-int framebufferHeight = windowHeight;
-
-bool firstMouseMove = true;
-double mouseX = -1;
-double mouseY = -1;
-bool leftMouseButtonDown = false;
-static double cursor_pos_x = 0;
-static double cursor_pos_y = 0;
-static double delta_x = 0;
-static double delta_y = 0;
-
-ModelGL *modelGL = NULL;
-
-const float TRANSLATION_INC = 0.1;
-
-const float CAMERA_WALK_SPEED = .1f;
-const float CAMERA_ROTATE_SPEED = 30.0f;
-
-glm::vec3 eye1 = glm::vec3(-2, 2, 2);
-glm::vec3 lookAt1 = glm::vec3(1, 0, 0);
-glm::vec3 up1 = glm::vec3(0, 1, 0);
-float fov1 = 60.0f;
-float nearPlane1 = 0.01f;
-float farPlane1 = 30.0f;
-int bufferWidth1 = framebufferWidth;
-int bufferHeight1 = framebufferHeight;
-
-Camera *camera = new Camera (eye1, lookAt1, up1, fov1, nearPlane1, farPlane1, bufferWidth1, bufferHeight1);
-
-glm::vec3 pos1 = glm::vec3(0, 3, 2);
-glm::vec3 color1 = glm::vec3(1, 1, 1);
-bool isPtLt = true;
-
-Light *light = new Light(pos1, color1, isPtLt);
-
-float shiny = 10.0;
-
-MeshShaderGL *shader;
-
-//tinyglft///////////////////////////////////////////////////////////////////////
-static std::string GetFilePathExtension(const std::string& FileName) {
-	if (FileName.find_last_of(".") != std::string::npos)
-		return FileName.substr(FileName.find_last_of(".") + 1);
-	return "";
-}
-
-bool ret = false;
-tinygltf::Model model;
-tinygltf::TinyGLTF loader;
-std::string errp;
-std::string warn;
-std::string ext;
-
-/*///////////////////////////////////////////////////////////////////////////////
-FUNCTIONS - GLFW Callbacks
-///////////////////////////////////////////////////////////////////////////////*/
-
-// GLFW error callback
-static void error_callback(int error, const char* description) {
-	cerr << "ERROR " << error << ": " << description << endl;
-}
-
-// GLFW key callback
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE) {
-		glfwSetWindowShouldClose(window, GL_TRUE);
-	}
-
-	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-		switch (key) {
-
-		case GLFW_KEY_SPACE:
-			modelGL->reset();
-			break;
-			
-		case GLFW_KEY_U:
-			modelGL->rotate(5.0f, glm::vec3(0, 0, 1)); //rotate modelGL by positive 5 degrees, z axis
-			break;
-
-		case GLFW_KEY_O:
-			modelGL->rotate(-5.0f, glm::vec3(0, 0, 1)); //rotate modelGL by negative 5 degrees, z axis
-			break;
-
-		case GLFW_KEY_E:
-			modelGL->rotate(5.0f, glm::vec3(1, 0, 0)); //rotate modelGL by positive 5 degrees, x axis
-			break;
-
-		case GLFW_KEY_R:
-			modelGL->rotate(-5.0f, glm::vec3(1, 0, 0)); //rotate modelGL by negative 5 degrees, x axis
-			break;
-
-		case GLFW_KEY_T:
-			modelGL->rotate(5.0f, glm::vec3(0, 1, 0)); //rotate modelGL by positive 5 degrees, y axis
-			break;
-
-		case GLFW_KEY_Y:
-			modelGL->rotate(-5.0f, glm::vec3(0, 1, 0)); //rotate modelGL by negative 5 degrees, y axis
-			break;
-
-		case GLFW_KEY_I:
-			modelGL->translate(glm::vec3(0, TRANSLATION_INC, 0)); //translate modelGL by positive TRANSLATION_INC in Y
-			break;
-
-		case GLFW_KEY_K:
-			modelGL->translate(glm::vec3(0, -TRANSLATION_INC, 0)); //translate modelGL by negative TRANSLATION_INC in Y
-			break;
-
-		case GLFW_KEY_L:
-			modelGL->translate(glm::vec3(TRANSLATION_INC, 0, 0)); //translate modelGL by positive TRANSLATION_INC in X
-			break;
-
-		case GLFW_KEY_J:
-			modelGL->translate(glm::vec3(-TRANSLATION_INC, 0, 0)); //translate modelGL by negative TRANSLATION_INC in X
-			break;
-
-		case GLFW_KEY_W:
-			camera->forward(CAMERA_WALK_SPEED);
-			break;
-
-		case GLFW_KEY_S:
-			camera->forward(-CAMERA_WALK_SPEED);
-			break;
-
-		case GLFW_KEY_D:
-			camera->strafeRight(CAMERA_WALK_SPEED);
-			break;
-
-		case GLFW_KEY_A:
-			camera->strafeRight(-CAMERA_WALK_SPEED);
-			break;
-
-		case GLFW_KEY_C:
-			if (light->getIsPointLight()) {
-				light->setIsPointLight(false);
-			}
-			else {
-				light->setIsPointLight(true);
-			}
-			break;
-
-		case GLFW_KEY_0:
-			shader->setMaterialChoice(0);
-			break;
-
-		case GLFW_KEY_1:
-			shader->setMaterialChoice(1);
-			break;
-
-		case GLFW_KEY_V:
-			shiny *= 5.0;
-			shader->setShininess(shiny);
-
-			break;
-
-		case GLFW_KEY_B:
-			shiny /= 5.0;
-			if (shiny < 10.0) {
-				shiny = 10.0;
-				
-			}
-			shader->setShininess(shiny);
-			break;
-
-		case GLFW_KEY_N:
-			glm::vec3 blue1 = glm::vec3(0, 0, 1);
-			light->setColor(blue1); //blue
-			break;
-
-		case GLFW_KEY_M:
-			glm::vec3 white1 = glm::vec3(1, 1, 1);
-			light->setColor(white1); //white
-			break;
-
-		default:
-			break;
-		}
-	}
-}
-
-// GLFW mouse movement callback
-static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos) {
-	if (firstMouseMove) {
-		mouseX = xpos;
-		mouseY = ypos;
-		firstMouseMove = false;
-	}
-
-	double xDiff = xpos - mouseX;
-	double yDiff = ypos - mouseY;
-
-	xDiff /= framebufferWidth;
-	yDiff /= framebufferHeight;
-
-	camera->rotateRight(-xDiff * CAMERA_ROTATE_SPEED);
-	camera->rotateUp(-yDiff * CAMERA_ROTATE_SPEED);
-
-	mouseX = xpos;
-	mouseY = ypos;
-}
-
-// GLFW callback mouse button
-static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-		double x, y, z;
-		glfwGetCursorPos(window, &x, &y);
-		cursor_pos_x = floor(x);
-		cursor_pos_y = floor(y);
-		x = (2.0f * cursor_pos_x) / windowWidth - 1.0f;
-		y = 1.0f - (2.0f * cursor_pos_y) / windowHeight;
-		z = 1.0f;
-		glm::vec3 ray_nds = glm::vec3(x, y, z);
-		glm::vec4 ray_clip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
-
-		glm::mat4 inversedprojMat = glm::inverse(glm::mat4(camera->getProjectionMatrix()));
-		glm::vec4 ray_eye = glm::vec4(inversedprojMat * ray_clip);
-
-		ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
-
-		glm::mat4 inversedviewMat = glm::inverse(glm::mat4(camera->getViewMatrix()));
-		glm::vec3 ray_wor = (inversedviewMat * ray_eye);
-
-		ray_wor = glm::normalize(ray_wor);
-	}
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-	}
-}
-
-// GLFW callback when the window changes size
-void window_size_callback(GLFWwindow* window, int width, int height) {
-	windowWidth = width;
-	windowHeight = height;
-}
-
-// GLFW callback when the framebuffer changes size
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-	framebufferWidth = width;
-	framebufferHeight = height;
-}
-
-/*///////////////////////////////////////////////////////////////////////////////
-FUNCTIONS - Main
+MAIN
 ///////////////////////////////////////////////////////////////////////////////*/
 
 int main(int argc, char **argv) {
 
 	// imgui-filebrowser - create file browser instances
 	ImGui::FileBrowser fileDialog;
-	fileDialog.SetTitle("Load .gltf or .glb");
-	fileDialog.SetTypeFilters({ ".gltf", ".glb" });
+	fileDialog.SetTitle("Load .txt");
+	fileDialog.SetTypeFilters({ ".txt" });
 
 	ImGui::FileBrowser fileDialog1;
 	fileDialog1.SetTitle("Load .obj");
 	fileDialog1.SetTypeFilters({ ".obj" });
-
-	// If an argument is passed in, load a 3D file.
-	// Otherwise, create a simple quad.
-	string modelFilename = "../objs/teddy.obj";
-	if (argc >= 2) {
-		modelFilename = string(argv[1]);
-	}
 
 	// GLFW setup //
 	
@@ -367,10 +60,10 @@ int main(int argc, char **argv) {
 	glfwSetKeyCallback(window, key_callback);
 	
 	// Set our mouse callback function for when the mouse MOVES
-	glfwSetCursorPosCallback(window, mouse_position_callback);
+	/*glfwSetCursorPosCallback(window, mouse_position_callback);*/
 
 	// Set our mouse BUTTON callback function
-	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	/*glfwSetMouseButtonCallback(window, mouse_button_callback);*/
 
 	// Set our callback for when the window changes size
 	glfwSetWindowSizeCallback(window, window_size_callback);
@@ -397,13 +90,13 @@ int main(int argc, char **argv) {
 	if (GLEW_OK != err) {
 		// We couldn't start GLEW, so we've got to go.
 		// Kill GLFW and get out of here
-		cout << "ERROR: GLEW could not start: " << glewGetErrorString(err) << endl;
+		std::cout << "ERROR: GLEW could not start: " << glewGetErrorString(err) << endl;
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
 
-	cout << "GLEW initialized; version ";
-	cout << glewGetString(GLEW_VERSION) << endl;
+	std::cout << "GLEW initialized; version ";
+	std::cout << glewGetString(GLEW_VERSION) << endl;
 
 	/*/////////////////////////////////////////////////////////////////////////////*/
 	// Setup Dear ImGui context
@@ -430,57 +123,29 @@ int main(int argc, char **argv) {
 	GLint glMajor, glMinor;
 	glGetIntegerv(GL_MAJOR_VERSION, &glMajor);
 	glGetIntegerv(GL_MINOR_VERSION, &glMinor);
-	cout << "OpenGL context version: ";
-	cout << glMajor << "." << glMinor << endl;
-	cout << "Supported GLSL version is ";
-	cout << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
+	std::cout << "OpenGL context version: ";
+	std::cout << glMajor << "." << glMinor << endl;
+	std::cout << "Supported GLSL version is ";
+	std::cout << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 
 	// Load shader program
 	shader = new MeshShaderGL("../core/Basic.vs", "../core/Basic.ps", true);
 
 	// Create/Get mesh data	
 	ModelData *modelData = NULL;
-	
-	if (modelFilename != "") {
-		cout << "Loading model: " << modelFilename << endl;
+	ModelData *modelData1 = NULL;
 
-		// Load model		
-		modelData = loadModel(modelFilename);
+	//Create/Get shader data
+	ModelGL *modelGL = NULL;
+	ModelGL *modelGL1 = NULL;
 
-		// Did we load the model?
-		if (!modelData) {
-			cout << "ERROR: Failed to set up model data." << endl;
-			glfwTerminate();
-			exit(EXIT_FAILURE);
-		}
-
-		// Override color per-vertex		
-		vector<Vertex>* vertices = modelData->getMesh(0)->getVertices();
-		for (int i = 0; i < vertices->size(); i++) {
-			glm::vec3 pos = vertices->at(i).pos;
-			pos += 1.0;
-			pos /= 2.0;
-			vertices->at(i).color = glm::vec4(pos.x, pos.y, pos.z, 1.0);
-		}		
-	}
-
-	modelGL = new ModelGL(modelData);
-
-	// Don't need local data anymore, so we can delete it
-	delete modelData;
-
-	// Set the background color to a shade of blue
-	glClearColor(0.0f, 0.0f, 0.7f, 1.0f);	
+	//Create a vector for objs
+	vector<ModelGL*> objFiles;
 
 	// Enable depth testing
 	glEnable(GL_DEPTH_TEST);
-
-	// Enable shader program
-	shader->activate();
-	shader->setShininess(shiny);
-	shader->setMaterialChoice(0);
 	
-	// Main Dear ImGui window////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Main Dear ImGui window//
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 
@@ -489,23 +154,22 @@ int main(int argc, char **argv) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		//ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiCond_FirstUseEver);
-
 		// Main window
 		{
 			ImGui::Begin("Main Menu");
 			ImGui::Text("%.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
 			ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
 			ImGui::Separator();
-			ImGui::Text("Save/Load");
-			if (ImGui::Button("Save .gltf/.glb File")) {
-				save_file_load_window = true;
-			}
-			if (ImGui::Button("Load .gltf/.glb File")) {
+			ImGui::Text("Load");
+			if (ImGui::Button("Load Scene")) {
 				show_file_load_window = true;
 			}
-			if (ImGui::Button("Load .obj")) {
+			if (ImGui::Button("Load Object")) {
 				load_an_obj_file = true;
+			}
+			ImGui::Separator();
+			if (ImGui::Button("Position/Color")) {
+				edit_obj_color = true;
 			}
 			ImGui::Separator();
 			ImGui::Text("Change Background Color");
@@ -513,11 +177,22 @@ int main(int argc, char **argv) {
 			ImGui::End();
 		}
 
-		// Edit color of object
+		// Edit color of object --------------------------->Still working on this.
 		if (edit_obj_color)
 		{
-			ImGui::Begin("Load an Object", &edit_obj_color);
-			ImGui::Text("");
+			ImGui::Begin("Position/Color", &edit_obj_color);
+			static float rotation = 0.0;
+			ImGui::SliderFloat("rotation", &rotation, 0, 2 * M_PI);
+			static float translation[] = { 0.0, 0.0 };
+			ImGui::SliderFloat2("position", translation, -1.0, 1.0);
+			static float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+			// pass parameters to the shader
+			//shader.setUniform("rotation", rotation);
+			//shader.setUniform("translation", translation[0], translation[1]);
+			// color picker
+			ImGui::ColorEdit3("color", color);
+			// multiply obj's color with this color
+			//shader.setUniform("color", color[0], color[1], color[2]);
 			if (ImGui::Button("Close")) {
 				edit_obj_color = false;
 			}
@@ -533,20 +208,18 @@ int main(int argc, char **argv) {
 				fileDialog1.Open();
 				fileDialog1.Display();
 				if (fileDialog1.HasSelected())
-				{//////////////////////////////////////////////////////////////////////////////////make new class for this
+				{
 					std::string fileName = fileDialog1.GetSelected().string();
 					ext = GetFilePathExtension(fileName);
 					if (ext == "obj") {
-						std::cout << fileName << '\n';
 						string modelFilename1 = fileName;
-						shader = new MeshShaderGL("../core/Basic.vs", "../core/Basic.ps", true);
-						ModelData* modelData1 = NULL;
 						modelData1 = loadModel(modelFilename1);
 							if (!modelData1) {
-								cout << "ERROR: Failed to set up model data." << endl;
+								std::cout << "ERROR: Failed to set up model data." << endl;
 								glfwTerminate();
 								exit(EXIT_FAILURE);
 							}
+							is_there_an_obj = -1;
 							vector<Vertex>* vertices = modelData1->getMesh(0)->getVertices();
 							for (int i = 0; i < vertices->size(); i++) {
 								glm::vec3 pos = vertices->at(i).pos;
@@ -554,40 +227,25 @@ int main(int argc, char **argv) {
 								pos /= 2.0;
 								vertices->at(i).color = glm::vec4(pos.x, pos.y, pos.z, 1.0);
 							}
-							modelGL = new ModelGL(modelData1);
-							delete modelData1;
-							glEnable(GL_DEPTH_TEST);
+							modelGL1 = new ModelGL(modelData1);
 							shader->activate();
 							shader->setShininess(shiny);
 							shader->setMaterialChoice(0);
 					}
+					fileDialog1.ClearSelected();
+					load_an_obj_file = false;
 				}
-
 			if (ImGui::Button("Close")) {
 				load_an_obj_file = false;
 			}
 			ImGui::End();
 		}
 
-		// .gltf/.glb File Save Window
-		if (save_file_load_window)
-		{
-			ImGui::Begin(".gltf/.glb File Save", &save_file_load_window);
-			ImGui::Text("Save .gltf/.glb File:");
-			if (ImGui::Button("Save File")) {
-				// empty
-			}
-			if (ImGui::Button("Close")) {
-				save_file_load_window = false;
-			}
-			ImGui::End();
-		}
-
-		//.gltf/.glb File Loader Window
+		//.txt Scene Loader
 		if (show_file_load_window)
 		{
-			ImGui::Begin(".gltf/.glb File Loader", &show_file_load_window);
-			ImGui::Text("Open .gltf/.glb File:");
+			ImGui::Begin(".txt Scene Loader", &show_file_load_window);
+			ImGui::Text("Open .txt Scene File:");
 			if (ImGui::Button("Open File"))
 				fileDialog.Open();
 				fileDialog.Display();
@@ -595,64 +253,54 @@ int main(int argc, char **argv) {
 				{
 					string fileName = fileDialog.GetSelected().string();
 					ext = GetFilePathExtension(fileName);
-					bool ret = false;
-
-					if (ext == "glb") {
-						// binary glTF - .glb
-						ret = loader.LoadBinaryFromFile(&model, &errp, &warn, fileName);
-
-						std::cout << "loaded .glb file has:\n"
-							<< model.accessors.size() << " accessors\n"
-							<< model.animations.size() << " animations\n"
-							<< model.buffers.size() << " buffers\n"
-							<< model.bufferViews.size() << " bufferViews\n"
-							<< model.materials.size() << " materials\n"
-							<< model.meshes.size() << " meshes\n"
-							<< model.nodes.size() << " nodes\n"
-							<< model.textures.size() << " textures\n"
-							<< model.images.size() << " images\n"
-							<< model.skins.size() << " skins\n"
-							<< model.samplers.size() << " samplers\n"
-							<< model.cameras.size() << " cameras\n"
-							<< model.scenes.size() << " scenes\n"
-							<< model.lights.size() << " lights\n";
-
-					}
-					else {
-						// ASCII glTF - .gltf
-						ret = loader.LoadASCIIFromFile(&model, &errp, &warn, fileName);
-
-						std::cout << "loaded .gltf file has:\n"
-							<< model.accessors.size() << " accessors\n"
-							<< model.animations.size() << " animations\n"
-							<< model.buffers.size() << " buffers\n"
-							<< model.bufferViews.size() << " bufferViews\n"
-							<< model.materials.size() << " materials\n"
-							<< model.meshes.size() << " meshes\n"
-							<< model.nodes.size() << " nodes\n"
-							<< model.textures.size() << " textures\n"
-							<< model.images.size() << " images\n"
-							<< model.skins.size() << " skins\n"
-							<< model.samplers.size() << " samplers\n"
-							<< model.cameras.size() << " cameras\n"
-							<< model.scenes.size() << " scenes\n"
-							<< model.lights.size() << " lights\n";
-
-					}
-
-					if (!warn.empty()) {
-						std::cerr << "glTF parse warning: " << warn << std::endl;
+					//if a txt file, parse each line, load models
+					if (ext == "txt") {
+						std::ifstream infile(fileName);
+						std::string line;
+						while (std::getline(infile, line))
+						{
+							std::istringstream iss(line);
+							string newObj;
+							string extenS = "../objs/";
+							double x, y, z;
+							//if no more lines or bad line
+							if (!(iss >> newObj >> x >> y >> z)) {
+								break; 
+							}
+							// process line (newObj, x, y, z)
+							newObj = extenS + newObj;
+							std::cout << "Loading model: " << newObj << " at: " << x << " " << y << " " << z << endl;
+							modelData = loadModel(newObj);
+							if (!modelData) {
+								std::cout << "ERROR: Failed to set up model data." << endl;
+								glfwTerminate();
+								exit(EXIT_FAILURE);
+							}
+							// increment if object loaded
+							how_many_objs = how_many_objs + 1;
+							vector<Vertex>* vertices = modelData->getMesh(0)->getVertices();
+							for (int i = 0; i < vertices->size(); i++) {
+								glm::vec3 pos = vertices->at(i).pos;
+								pos += 1.0;
+								pos /= 2.0;
+								vertices->at(i).color = glm::vec4(pos.x, pos.y, pos.z, 1.0);
+							}
+							modelGL = new ModelGL(modelData);
+							objFiles.push_back(modelGL);
+							shader->activate();
+							shader->setShininess(shiny);
+							shader->setMaterialChoice(0);
+							glClearColor(0.0f, 0.0f, 0.7f, 1.0f);
+							glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+							//load object at parsed-in x, y, z coordinates
+							modelGL->translate(glm::vec3(x, y, z));
+							modelData = NULL;
+							modelGL = NULL;
+						}
 					}
 
-					if (!errp.empty()) {
-						std::cerr << "glTF parse error: " << errp << std::endl;
-					}
-
-					if (!ret) {
-						std::cerr << "Failed to load glTF: " << fileName << std::endl;
-						return false;
-					}
 					fileDialog.ClearSelected();
+					show_file_load_window = false;
 				}
 				if (ImGui::Button("Close")) {
 					show_file_load_window = false;
@@ -670,10 +318,16 @@ int main(int argc, char **argv) {
 		glfwGetFramebufferSize(window, &display_w, &display_h);
 		glViewport(0, 0, display_w, display_h);
 		glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-		/*Clear the framebuffer*/
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		/*Draw the mesh using ModelGL's draw() method (passing in the shader)*/
-		modelGL->draw(shader);
+		if (is_there_an_obj == -1) {
+			modelGL1->draw(shader);
+		}
+		if (how_many_objs >= 1) {
+			for (int i=0; i < objFiles.size(); i++) {
+				objFiles[i]->draw(shader);
+			}
+		}
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwSwapBuffers(window);
 	}
@@ -681,8 +335,12 @@ int main(int argc, char **argv) {
 	// Cleanup		
 	delete shader;
 
-	// Delete instance of ModelGL
+	// Delete modelData and modelGL, clear vector
+	delete modelData1;
+	delete modelGL1;
+	delete modelData;
 	delete modelGL;
+	objFiles.clear();
 
 	// Teardown dearimgui
 	ImGui_ImplOpenGL3_Shutdown();

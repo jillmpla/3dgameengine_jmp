@@ -15,6 +15,8 @@ private:
 
 
 public:
+	ModelGL();
+
 	ModelGL(ModelData *data);
 
 	~ModelGL();

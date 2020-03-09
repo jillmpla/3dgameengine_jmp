@@ -1,3 +1,9 @@
+/*
+//
+// NOTE: The code that follows is heavily inspired by code from https://learnopengl.com/.
+//
+*/
+
 #define _USE_MATH_DEFINES
 #include "ModelLoader.hpp"
 #include <iostream>
@@ -13,11 +19,11 @@ using namespace std;
 
 void getAllTextureFilename(
 	string directory,
-	const aiMaterial* mat,
+	const aiMaterial *mat,
 	aiTextureType type,
-	vector<int>& textureList,
+	vector<int> &textureList,
 	unordered_map<string, int> allTextureIndices,
-	ModelData* model) {
+	ModelData *model) {
 
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
 		// Get filename
@@ -30,7 +36,7 @@ void getAllTextureFilename(
 
 		if (got == allTextureIndices.end()) {
 			// We don't have it, so load it up!
-			TextureData* texture = new TextureData(directory + "/" + filename);
+			TextureData *texture = new TextureData(directory + "/" + filename);
 			int texIndex = model->addTexture(texture);
 			textureList.push_back(texIndex);
 			allTextureIndices[filename] = texIndex;
@@ -42,14 +48,14 @@ void getAllTextureFilename(
 	}
 }
 
-void addDefaultTextures(ModelData* model, int& diffuseTex, int& specTex, int& normalTex) {
+void addDefaultTextures(ModelData *model, int &diffuseTex, int &specTex, int &normalTex) {
 	diffuseTex = model->addTexture(new TextureData(1, 1, glm::vec4(1, 1, 1, 1)));
 	specTex = model->addTexture(new TextureData(1, 1, glm::vec4(0.5, 0.5, 0.5, 1)));
 	normalTex = model->addTexture(new TextureData(1, 1, glm::vec4(0.5, 0.5, 1, 0)));
 }
 
-int addDefaultMaterial(ModelData* model, int diffuseTex, int specTex, int normalTex) {
-	MaterialData* defaultMat = new MaterialData();
+int addDefaultMaterial(ModelData *model, int diffuseTex, int specTex, int normalTex) {
+	MaterialData *defaultMat = new MaterialData();
 	defaultMat->setName("DEFAULT_MAT");
 	defaultMat->setKd(glm::vec3(1, 1, 1));
 	defaultMat->setKs(glm::vec3(1, 1, 1));
@@ -60,7 +66,7 @@ int addDefaultMaterial(ModelData* model, int diffuseTex, int specTex, int normal
 	return model->addMaterial(defaultMat);
 }
 
-void loadAllMaterials(string directory, const aiScene* scene, ModelData* model) {
+void loadAllMaterials(string directory, const aiScene *scene, ModelData *model) {
 
 	// Create a mapping of name to texture index
 	unordered_map<string, int> textureIndices;
@@ -82,10 +88,10 @@ void loadAllMaterials(string directory, const aiScene* scene, ModelData* model) 
 	// Loop through and load all materials
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++) {
 		// Get Assimp material
-		aiMaterial* mat = scene->mMaterials[i];
+		aiMaterial *mat = scene->mMaterials[i];
 
 		// Create our material
-		MaterialData* ourMat = new MaterialData();
+		MaterialData *ourMat = new MaterialData();
 
 		// Get name
 		aiString name;
@@ -159,7 +165,7 @@ void loadAllMaterials(string directory, const aiScene* scene, ModelData* model) 
 	}
 }
 
-void processMesh(aiMesh* mesh, const aiScene* scene, ModelData* model) {
+void processMesh(aiMesh *mesh, const aiScene *scene, ModelData *model) {
 	vector<Vertex> vertices;
 	vector<unsigned int> indices;
 
@@ -211,15 +217,15 @@ void processMesh(aiMesh* mesh, const aiScene* scene, ModelData* model) {
 	int matIndex = mesh->mMaterialIndex;
 
 	// Create the MeshData and add it
-	MeshData* meshData = new MeshData(vertices, indices);
+	MeshData *meshData = new MeshData(vertices, indices);
 	model->addMesh(meshData, matIndex);
 }
 
-void processNode(aiNode* node, const aiScene* scene, ModelData* model) {
+void processNode(aiNode *node, const aiScene *scene, ModelData *model) {
 	// Go through all meshes...
 	for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 		// Grab the aiMesh
-		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+		aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
 		// Process the aiMesh and add it to our list of meshes
 		processMesh(mesh, scene, model);
 	}
@@ -234,7 +240,7 @@ ModelData* loadModel(string path) {
 
 	// Load model data
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_JoinIdenticalVertices); // | aiProcess_FixInfacingNormals);
+	const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_JoinIdenticalVertices); // | aiProcess_FixInfacingNormals);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 		cout << "Error: " << importer.GetErrorString() << endl;
@@ -245,7 +251,7 @@ ModelData* loadModel(string path) {
 	string directory = path.substr(0, path.find_last_of('/'));
 
 	// Create the ModelData object
-	ModelData* model = new ModelData();
+	ModelData *model = new ModelData();
 
 	// Load all materials
 	loadAllMaterials(directory, scene, model);
@@ -255,3 +261,4 @@ ModelData* loadModel(string path) {
 
 	return model;
 }
+

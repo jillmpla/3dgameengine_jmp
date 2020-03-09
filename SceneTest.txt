@@ -1,0 +1,2 @@
+sphere.obj 5 5 10
+teddy.obj 1 1 1

@@ -1,6 +1,10 @@
 #include "ModelGL.hpp"
 #include "ModelData.hpp"
 
+
+ModelGL::ModelGL() {
+}
+
 ModelGL::ModelGL(ModelData *data) {
 	for (int x = 0; x < data->getMeshCnt(); x++) {
 		meshes.push_back(new MeshGL(data->getMesh(x)));
