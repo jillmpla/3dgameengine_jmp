@@ -32,6 +32,7 @@
 #include "core/MeshGL.hpp"
 #include "core/Camera.hpp"
 #include "core/Light.hpp"
+#include "core/MousePicker.hpp"
 /*Dear ImGui*/
 #include "libs/dearimgui/imgui.h"
 #include "libs/dearimgui/imgui_impl_glfw.h"
@@ -104,7 +105,9 @@ Light* light = new Light(pos1, color1, isPtLt);
 
 float shiny = 10.0;
 
-MeshShaderGL* shader;
+MeshShaderGL *shader;
+
+MousePicker *mousePick;
 
 //tinyglft///////////////////////////////////////////////////////////////////////
 static std::string GetFilePathExtension(const std::string& FileName) {
@@ -267,32 +270,18 @@ static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos
 	mouseY = ypos;
 }*/
 
-/*// GLFW callback for mouse BUTTONS
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-	if (button == GLFW_MOUSE_BUTTON_LEFT) {
-		if (action == GLFW_PRESS) {
-			cout << "MOUSE LEFT DOWN" << endl;
-			leftMouseButtonDown = true;
-		}
-		else if (action == GLFW_RELEASE) {
-			cout << "MOUSE LEFT UP" << endl;
-			leftMouseButtonDown = false;
-		}
-	}
-}*/
-
-// GLFW callback mouse drag
-/*static void mouse_button_callback(GLFWwindow* window, int button, int action,
+/*// GLFW callback mouse button
+static void mouse_button_callback(GLFWwindow* window, int button, int action,
 	int mods) {
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-		window_drag_active = 1;
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
 		double x, y;
-		glfwGetCursorPos(window, &x, &y);
-		cursor_pos_x = floor(x);
-		cursor_pos_y = floor(y);
-	}
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-		window_drag_active = 0;
+		glfwGetCursorPos(window, &x, &y); //get screen coordinates from cursor
+		mousePick->saveCoordX(x);
+		mousePick->saveCoordY(y);
+		mousePick->updateBufferW(framebufferWidth);
+		mousePick->updateBufferH(framebufferHeight);
+		mousePick->update();
+		cout << "Current Ray: " << glm::to_string(mousePick->getCurrentRay()) << endl;
 	}
 }*/
 

@@ -60,10 +60,10 @@ int main(int argc, char **argv) {
 	glfwSetKeyCallback(window, key_callback);
 	
 	// Set our mouse callback function for when the mouse MOVES
-	/*glfwSetCursorPosCallback(window, mouse_position_callback);*/
+	//glfwSetCursorPosCallback(window, mouse_position_callback);
 
 	// Set our mouse BUTTON callback function
-	/*glfwSetMouseButtonCallback(window, mouse_button_callback);*/
+	//glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 	// Set our callback for when the window changes size
 	glfwSetWindowSizeCallback(window, window_size_callback);
@@ -141,6 +141,9 @@ int main(int argc, char **argv) {
 
 	//Create a vector for objs
 	vector<ModelGL*> objFiles;
+
+	// MousePicker
+	MousePicker *mousePick = new MousePicker(camera);
 
 	// Enable depth testing
 	glEnable(GL_DEPTH_TEST);
@@ -313,6 +316,17 @@ int main(int argc, char **argv) {
 		camera->updateBufferSize(framebufferWidth, framebufferHeight);
 		shader->setViewAndProjection(camera);
 		shader->setLight(light);
+
+		//cursor ray
+		double x, y;
+		glfwGetCursorPos(window, &x, &y); //get screen coordinates from cursor
+		mousePick->saveCoordX(x);
+		mousePick->saveCoordY(y);
+		mousePick->updateBufferW(framebufferWidth);
+		mousePick->updateBufferH(framebufferHeight);
+		mousePick->update();
+		cout << "Current Ray: " << glm::to_string(mousePick->getCurrentRay()) << endl;
+
 		/*/////////////////////////////////////////////////////////////////////////////*/
 		int display_w, display_h;
 		glfwGetFramebufferSize(window, &display_w, &display_h);
