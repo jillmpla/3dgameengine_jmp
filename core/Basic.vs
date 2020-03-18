@@ -8,6 +8,7 @@ out vec4 vertexColor;
 out vec4 viewPos;
 out vec3 viewNormal;
 
+//uniform == does not change during rendering pass
 uniform mat4 modelMat;
 uniform mat4 viewMat;
 uniform mat4 projMat;

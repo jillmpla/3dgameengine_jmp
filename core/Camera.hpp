@@ -30,4 +30,5 @@ public:
 
 	void strafeRight(float distance);
 
+	float getNearPlane();
 };

@@ -1,4 +1,7 @@
 #include "MousePicker.hpp"
+#include <iostream>
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/string_cast.hpp"
 
 MousePicker::MousePicker(Camera *cam) {
 	camera = cam;
@@ -18,22 +21,22 @@ void MousePicker::update() {
 
 //get x coord from mousecallback
 void MousePicker::saveCoordX(double x) {
-	x = x;
+	this->x = x;
 }
 
 //get y coord from mousecallback
 void MousePicker::saveCoordY(double y) {
-	y = y;
+	this->y = y;
 }
 
 //get width from mousecallback
 void MousePicker::updateBufferW(int width) {
-	width = width;
+	this->width = width;
 }
 
 //get height from mousecallback
 void MousePicker::updateBufferH(int height) {
-	height = height;
+	this->height = height;
 }
 
 glm::vec3 MousePicker::calculateMouseRay() {
@@ -41,10 +44,12 @@ glm::vec3 MousePicker::calculateMouseRay() {
 	double x1 = x;
 	double y1 = y;
 	glm::vec2 normalCoords = getNormalizedDevCoor(x1, y1);
+	//std::cout << "XY: " << normalCoords.x << " " << normalCoords.y << std::endl;
 	//clip space
-	glm::vec4 clipCoords = glm::vec4(normalCoords.x, normalCoords.y, -1.0f, 1.0f);
+	clipCoords = glm::vec4(normalCoords.x, normalCoords.y, -1.0f, 1.0f);
 	//eye space
 	glm::vec4 eyeSpaceCoords = toEye(clipCoords);
+	//std::cout << "EYE: " << eyeSpaceCoords.x << " " << eyeSpaceCoords.y << " " << eyeSpaceCoords.z << std::endl;
 	//world space
 	glm::vec3 worldSpaceRay = toWorldCoor(eyeSpaceCoords);
 	return worldSpaceRay;
@@ -53,8 +58,8 @@ glm::vec3 MousePicker::calculateMouseRay() {
 //clip space to eye space/4d eye coordinates
 glm::vec4 MousePicker::toEye(glm::vec4 clips) {
 	glm::mat4 invProj = glm::inverse(projMatriX);
-	glm::vec4 eyeCoor = invProj * clipCoords;
-	glm::vec4 eyeCoorFinal = glm::vec4(eyeCoor.x, eyeCoor.y, -1.0f, 1.0f);
+	glm::vec4 eyeCoor = invProj * clips;
+	glm::vec4 eyeCoorFinal = glm::vec4(eyeCoor.x, eyeCoor.y, -camera->getNearPlane(), 1.0f);
 	return eyeCoorFinal;
 }
 
@@ -63,7 +68,7 @@ glm::vec3 MousePicker::toWorldCoor(glm::vec4 eyeSpaceCoords) {
 	glm::mat4 invView = glm::inverse(viewMatriX);
 	glm::vec4 rWorld = invView * eyeSpaceCoords;
 	glm::vec3 finalWorld = glm::vec3(rWorld.x, rWorld.y, rWorld.z);
-	glm::vec3 normalfinalWorld = glm::normalize(finalWorld);
+	//glm::vec3 normalfinalWorld = glm::normalize(finalWorld);
 	return normalfinalWorld;
 }
 

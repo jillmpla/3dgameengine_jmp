@@ -6,10 +6,10 @@ Camera::Camera(glm::vec3 eye1, glm::vec3 lookAt1, glm::vec3 up1, float fovDegree
 	lookAt = lookAt1;
 	up = up1;
 	fov = glm::radians(fovDegrees1);
-	float nearPlane = nearPlane1;
-	float farPlane = farPlane1;
-	float bufferWidth = float(bufferWidth1);
-	float bufferHeight = float(bufferHeight1);
+	nearPlane = nearPlane1;
+	farPlane = farPlane1;
+	bufferWidth = float(bufferWidth1);
+	bufferHeight = float(bufferHeight1);
 }
 
 void Camera::updateBufferSize(int width1, int height1) {
@@ -84,4 +84,8 @@ void Camera::strafeRight(float distance) {
 
 	lookAt = glm::vec3(other);
 	eye = glm::vec3(other1);
+}
+
+float Camera::getNearPlane() {
+	return nearPlane;
 }
