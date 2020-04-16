@@ -134,13 +134,24 @@ int main(int argc, char **argv) {
 	// Create/Get mesh data	
 	ModelData *modelData = NULL;
 	ModelData *modelData1 = NULL;
+	ModelData *tempModelData1 = NULL;
+	ModelData *tempModelData2 = NULL;
 
 	//Create/Get shader data
 	ModelGL *modelGL = NULL;
 	ModelGL *modelGL1 = NULL;
+	ModelGL *temp1 = NULL;
+	ModelGL *temp2 = NULL;
 
-	//Create a vector for objs
-	vector<ModelGL*> objFiles;
+	//Collider, Actor
+	Collide *collide1 = NULL;
+	Collide *collide = NULL;
+	Actor *anActor;
+	Actor *anActor0;
+
+	//Create a vector for Actor objs
+	vector<Actor*> objFiles;
+	vector<Actor*> objFiles1;
 
 	// MousePicker
 	MousePicker *mousePick = new MousePicker(camera);
@@ -222,7 +233,8 @@ int main(int argc, char **argv) {
 								glfwTerminate();
 								exit(EXIT_FAILURE);
 							}
-							is_there_an_obj = -1;
+							// increment if object loaded
+							how_many_objs1 = how_many_objs1 + 1;
 							vector<Vertex>* vertices = modelData1->getMesh(0)->getVertices();
 							for (int i = 0; i < vertices->size(); i++) {
 								glm::vec3 pos = vertices->at(i).pos;
@@ -230,10 +242,20 @@ int main(int argc, char **argv) {
 								pos /= 2.0;
 								vertices->at(i).color = glm::vec4(pos.x, pos.y, pos.z, 1.0);
 							}
+							collide1 = new Collide(modelData1);
 							modelGL1 = new ModelGL(modelData1);
+							anActor = new Actor(modelData1, modelGL1, collide1);
+							//add Actor obj here
+							objFiles1.push_back(anActor);
 							shader->activate();
 							shader->setShininess(shiny);
 							shader->setMaterialChoice(0);
+							glClearColor(0.0f, 0.0f, 0.7f, 1.0f);
+							glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+							//load object at 0, 0, 0 coordinates
+							modelGL1->translate(glm::vec3(0, 0, 0));
+							modelData1 = NULL;
+							modelGL1 = NULL;
 					}
 					fileDialog1.ClearSelected();
 					load_an_obj_file = false;
@@ -289,7 +311,10 @@ int main(int argc, char **argv) {
 								vertices->at(i).color = glm::vec4(pos.x, pos.y, pos.z, 1.0);
 							}
 							modelGL = new ModelGL(modelData);
-							objFiles.push_back(modelGL);
+							collide = new Collide(modelData);
+							anActor0 = new Actor(modelData, modelGL, collide);
+							//add Actor obj here
+							objFiles1.push_back(anActor0);
 							shader->activate();
 							shader->setShininess(shiny);
 							shader->setMaterialChoice(0);
@@ -334,12 +359,20 @@ int main(int argc, char **argv) {
 		glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		/*Draw the mesh using ModelGL's draw() method (passing in the shader)*/
-		if (is_there_an_obj == -1) {
-			modelGL1->draw(shader);
+		if (how_many_objs1 >= 1) {
+			for (int i = 0; i < objFiles1.size(); i++) {
+				temp1 = objFiles1[i]->returnModelGL();
+				temp1->draw(shader);
+				tempModelData1 = objFiles1[i]->returnModelData();
+				tempModelData1->draw_bounds(tempModelData1);
+			}
 		}
 		if (how_many_objs >= 1) {
 			for (int i=0; i < objFiles.size(); i++) {
-				objFiles[i]->draw(shader);
+				temp2 = objFiles[i]->returnModelGL();
+				temp2->draw(shader);
+				tempModelData2 = objFiles1[i]->returnModelData();
+				tempModelData2->draw_bounds(tempModelData2);
 			}
 		}
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -349,12 +382,21 @@ int main(int argc, char **argv) {
 	// Cleanup		
 	delete shader;
 
-	// Delete modelData and modelGL, clear vector
+	// Delete/Clear
 	delete modelData1;
-	delete modelGL1;
 	delete modelData;
+	delete modelGL1;
 	delete modelGL;
+	delete collide;
+	delete collide1;
+	delete anActor;
+	delete anActor0;
+	delete temp1;
+	delete temp2;
+	delete tempModelData1;
+	delete tempModelData2;
 	objFiles.clear();
+	objFiles1.clear();
 
 	// Teardown dearimgui
 	ImGui_ImplOpenGL3_Shutdown();

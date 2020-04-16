@@ -4,6 +4,9 @@
 #include "MeshData.hpp"
 #include "TextureData.hpp"
 #include "MaterialData.hpp"
+#include "ModelGL.hpp"
+#include "MeshShaderGL.hpp"
+
 using namespace std;
 
 class ModelData {
@@ -31,6 +34,8 @@ public:
 	MaterialData* getMaterial(int index);
 	MeshData* getMesh(int index);
 	int getMaterialIndex(int meshIndex);
+
+	void ModelData::draw_bounds(ModelData* tempMD);
 };
 
 #endif

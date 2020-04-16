@@ -69,7 +69,7 @@ glm::vec3 MousePicker::toWorldCoor(glm::vec4 eyeSpaceCoords) {
 	glm::vec4 rWorld = invView * eyeSpaceCoords;
 	glm::vec3 finalWorld = glm::vec3(rWorld.x, rWorld.y, rWorld.z);
 	//glm::vec3 normalfinalWorld = glm::normalize(finalWorld);
-	return normalfinalWorld;
+	return finalWorld;
 }
 
 glm::vec2 MousePicker::getNormalizedDevCoor(double x1, double y1) {

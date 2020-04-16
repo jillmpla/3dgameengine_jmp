@@ -33,6 +33,8 @@
 #include "core/Camera.hpp"
 #include "core/Light.hpp"
 #include "core/MousePicker.hpp"
+#include "physics/Collide.hpp"
+#include "physics/Actor.hpp"
 /*Dear ImGui*/
 #include "libs/dearimgui/imgui.h"
 #include "libs/dearimgui/imgui_impl_glfw.h"
@@ -77,9 +79,9 @@ static double cursor_pos_y = 0;
 static double delta_x = 0;
 static double delta_y = 0;
 
-ModelGL* modelGL = NULL;
-int is_there_an_obj = 0;
+//ModelGL* modelGL = NULL;
 int how_many_objs = 0;
+int how_many_objs1 = 0;
 
 const float TRANSLATION_INC = 0.1;
 
@@ -282,6 +284,7 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action,
 		mousePick->updateBufferH(framebufferHeight);
 		mousePick->update();
 		cout << "Current Ray: " << glm::to_string(mousePick->getCurrentRay()) << endl;
+				//check for mouse button down then get ray then check for collision then drag object
 	}
 }*/
 

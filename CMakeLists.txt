@@ -129,6 +129,9 @@ file(GLOB GENERAL_SOURCES
        ${PROJECT_SOURCE_DIR}/core/*.cpp
        ${PROJECT_SOURCE_DIR}/core/*.hpp
        ${PROJECT_SOURCE_DIR}/core/*.h
+       ${PROJECT_SOURCE_DIR}/physics/*.cpp
+       ${PROJECT_SOURCE_DIR}/physics/*.hpp
+       ${PROJECT_SOURCE_DIR}/physics/*.h
        ${PROJECT_SOURCE_DIR}/libs/*.cpp
        ${PROJECT_SOURCE_DIR}/libs/*.hpp
        ${PROJECT_SOURCE_DIR}/libs/*.h
