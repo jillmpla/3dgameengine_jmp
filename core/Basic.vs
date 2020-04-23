@@ -13,7 +13,6 @@ uniform mat4 modelMat;
 uniform mat4 viewMat;
 uniform mat4 projMat;
 uniform mat3 normMat;
-uniform mat4 transform; //sent in from MeshShaderGL::draw_bounds
 
 void main()
 {		
@@ -21,7 +20,7 @@ void main()
 	vec4 objPos = vec4(position, 1.0);
 
 	// pass vertex position
-	gl_Position = transform*projMat*viewMat*modelMat*objPos;
+	gl_Position = projMat*viewMat*modelMat*objPos;
 
 	// Output per-vertex color
 	vertexColor = color;

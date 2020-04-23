@@ -10,8 +10,6 @@ private:
 	GLuint VAO = 0; //ID of vertex array object
 	int indexCnt = 0; //Number of indices in the index buffer
 
-
-
 public: 
 	MeshGL(MeshData *data);
 

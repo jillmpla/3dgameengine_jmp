@@ -11,11 +11,15 @@
 class MeshShaderGL : public ShaderGL {
 public:
 	MeshShaderGL(std::string vertex, std::string fragment, bool isFilepath);
+	~MeshShaderGL();
 	void setModelTransform(glm::mat4 &modelMat);
 	void setViewAndProjection(Camera *camera);
 	void setLight(Light *light);
 	void setShininess(float s);
 	void setMaterialChoice(int choice);
+
+	void createBoundingBox();	
+	void cleanupBoundingBox();
 	void draw_bounds(ModelData *tempMD);
 
 private:
@@ -34,4 +38,8 @@ private:
 
 	GLint transformLoc = -1;
 
+	// Bounding box data
+	GLuint bound_VBO = 0; //ID of vertex buffer
+	GLuint bound_EBO = 0; //ID of index buffer
+	GLuint bound_VAO = 0; //ID of vertex array object
 };
