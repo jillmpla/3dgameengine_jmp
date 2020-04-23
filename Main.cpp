@@ -136,6 +136,8 @@ int main(int argc, char **argv) {
 	ModelData *modelData1 = NULL;
 	ModelData *tempModelData1 = NULL;
 	ModelData *tempModelData2 = NULL;
+	MeshShaderGL *tempModelDataGL1 = NULL;
+	MeshShaderGL *tempModelDataGL2 = NULL;
 
 	//Create/Get shader data
 	ModelGL *modelGL = NULL;
@@ -238,6 +240,7 @@ int main(int argc, char **argv) {
 							vector<Vertex>* vertices = modelData1->getMesh(0)->getVertices();
 							for (int i = 0; i < vertices->size(); i++) {
 								glm::vec3 pos = vertices->at(i).pos;
+								//rescaling
 								pos += 1.0;
 								pos /= 2.0;
 								vertices->at(i).color = glm::vec4(pos.x, pos.y, pos.z, 1.0);
@@ -364,7 +367,7 @@ int main(int argc, char **argv) {
 				temp1 = objFiles1[i]->returnModelGL();
 				temp1->draw(shader);
 				tempModelData1 = objFiles1[i]->returnModelData();
-				tempModelData1->draw_bounds(tempModelData1);
+				tempModelDataGL1->draw_bounds(tempModelData1);
 			}
 		}
 		if (how_many_objs >= 1) {
@@ -372,7 +375,7 @@ int main(int argc, char **argv) {
 				temp2 = objFiles[i]->returnModelGL();
 				temp2->draw(shader);
 				tempModelData2 = objFiles1[i]->returnModelData();
-				tempModelData2->draw_bounds(tempModelData2);
+				tempModelDataGL2->draw_bounds(tempModelData2);
 			}
 		}
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -395,6 +398,8 @@ int main(int argc, char **argv) {
 	delete temp2;
 	delete tempModelData1;
 	delete tempModelData2;
+	delete tempModelDataGL1;
+	delete tempModelDataGL2;
 	objFiles.clear();
 	objFiles1.clear();
 

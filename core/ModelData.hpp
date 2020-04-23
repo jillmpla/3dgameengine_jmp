@@ -6,6 +6,9 @@
 #include "MaterialData.hpp"
 #include "ModelGL.hpp"
 #include "MeshShaderGL.hpp"
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtc/matrix_transform.hpp>
+
 
 using namespace std;
 
@@ -35,7 +38,6 @@ public:
 	MeshData* getMesh(int index);
 	int getMaterialIndex(int meshIndex);
 
-	void ModelData::draw_bounds(ModelData* tempMD);
 };
 
 #endif

@@ -5,6 +5,8 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "ModelData.hpp"
 #include "Light.hpp"
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtc/matrix_transform.hpp>
 
 class MeshShaderGL : public ShaderGL {
 public:
@@ -14,6 +16,7 @@ public:
 	void setLight(Light *light);
 	void setShininess(float s);
 	void setMaterialChoice(int choice);
+	void draw_bounds(ModelData *tempMD);
 
 private:
 	GLint modelMatLoc = -1;
@@ -28,4 +31,7 @@ private:
 	GLint lightColor = -1;
 	GLint shininess = -1;
 	GLint material = -1;
+
+	GLint transformLoc = -1;
+
 };
