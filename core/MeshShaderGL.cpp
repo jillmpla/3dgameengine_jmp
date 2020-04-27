@@ -1,4 +1,9 @@
 #include "MeshShaderGL.hpp"
+#include <iostream>
+using namespace std;
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/string_cast.hpp"
+#include "glm/gtx/transform.hpp"
 
 MeshShaderGL::MeshShaderGL(std::string vertex, std::string fragment, bool isFilepath) : ShaderGL(vertex, fragment, isFilepath) 
 {
@@ -11,11 +16,11 @@ MeshShaderGL::MeshShaderGL(std::string vertex, std::string fragment, bool isFile
 	shininess = glGetUniformLocation(programID, "shiny");
 	material = glGetUniformLocation(programID, "matChoice");
 
-  createBoundingBox();
+    createBoundingBox();
 }
 
 MeshShaderGL::~MeshShaderGL() {
-  cleanupBoundingBox();
+    cleanupBoundingBox();
 }
 
 void MeshShaderGL::setModelTransform(glm::mat4 &modelMat) {
@@ -52,8 +57,9 @@ void MeshShaderGL::setMaterialChoice(int choice) {
 }
 
 void MeshShaderGL::createBoundingBox() {
-  
+
     // Cube 1x1x1 - center on origin
+
     GLfloat vertices1[] = {
       -0.5, -0.5, -0.5, 1.0,
        0.5, -0.5, -0.5, 1.0,
@@ -71,14 +77,14 @@ void MeshShaderGL::createBoundingBox() {
 
     glGenBuffers(1, &bound_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, bound_VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*48, vertices1, GL_STATIC_DRAW); //32
     
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0); 
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0);
 
     /////////////////////////////////////////
 
-    GLushort elements[] = {
+    GLuint elements[] = {
       0, 1, 2, 3,
       4, 5, 6, 7,
       0, 4, 1, 5, 2, 6, 3, 7
@@ -86,7 +92,7 @@ void MeshShaderGL::createBoundingBox() {
     
     glGenBuffers(1, &bound_EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bound_EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW); 
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*16, elements, GL_STATIC_DRAW); //16
 }
 
 void MeshShaderGL::cleanupBoundingBox() {
@@ -94,12 +100,11 @@ void MeshShaderGL::cleanupBoundingBox() {
     glDeleteBuffers(1, &bound_VBO);
     glDeleteBuffers(1, &bound_EBO);
     glBindVertexArray(0);
-	  glDeleteVertexArrays(1, &bound_VAO);
+	glDeleteVertexArrays(1, &bound_VAO);
 }
 
-//draw bounding box around obj/////////////////////////////////////////////////////////////////////
-void MeshShaderGL::draw_bounds(ModelData *tempMD) {
-    // THIS IS THE PART THAT FIGURES OUT WHAT THE SIZE AND POSITION OF THE BOUNDING BOX IS
+void MeshShaderGL::draw_bounds(ModelData *tempMD, glm::mat4 mainModelMatrix) {
+    // size and position of bounding box
     GLfloat
         min_x, max_x,
         min_y, max_y,
@@ -107,11 +112,13 @@ void MeshShaderGL::draw_bounds(ModelData *tempMD) {
 
     vector<Vertex>* vertices = tempMD->getMesh(0)->getVertices();
     glm::vec3 pos = vertices->at(0).pos;
+    pos = glm::vec3(mainModelMatrix * glm::vec4(pos, 1.0));
     min_x = max_x = pos.x;
     min_y = max_y = pos.y;
     min_z = max_z = pos.z;
     for (int i = 0; i < vertices->size(); i++) {
         pos = vertices->at(i).pos;
+        pos = glm::vec3(mainModelMatrix * glm::vec4(pos, 1.0));
         if (pos.x < min_x) min_x = pos.x;
         if (pos.x > max_x) max_x = pos.x;
         if (pos.y < min_y) min_y = pos.y;
@@ -122,12 +129,11 @@ void MeshShaderGL::draw_bounds(ModelData *tempMD) {
     glm::vec3 size = glm::vec3(max_x - min_x, max_y - min_y, max_z - min_z);
     glm::vec3 center = glm::vec3((min_x + max_x) / 2.0, (min_y + max_y) / 2.0, (min_z + max_z) / 2.0);
     glm::mat4 transform = glm::translate(glm::mat4(1), center) * glm::scale(glm::mat4(1), size);
-    // END 
 
     //apply object transformation    
     glUniformMatrix4fv(modelMatLoc, 1, GL_FALSE, glm::value_ptr(transform));
 
     glBindVertexArray(bound_VAO);
-	  glDrawElements(GL_TRIANGLES, 16, GL_UNSIGNED_INT, (void*)0);
-	  glBindVertexArray(0);
+	glDrawElements(GL_LINE_LOOP, 16, GL_UNSIGNED_INT, (void*)0); //16
+	glBindVertexArray(0);
 }

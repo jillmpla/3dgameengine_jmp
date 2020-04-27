@@ -11,6 +11,5 @@ private:
 
 public:
 	Collide(ModelData* a);
-	//bool doesIntersect(glm::vec3 start, glm::vec3 dir);
 
 };

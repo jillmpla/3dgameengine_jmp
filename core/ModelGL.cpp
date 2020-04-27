@@ -63,3 +63,11 @@ void ModelGL::reset() {
 	centerofModel = glm::vec3(0, 0, 0);
 	modelMatrix = glm::mat4(1.0f);
 }
+
+glm::vec3 ModelGL::getCenterofModel() {
+	return centerofModel;
+}
+
+glm::mat4 ModelGL::getModel() {
+	return modelMatrix;
+}

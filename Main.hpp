@@ -79,9 +79,7 @@ static double cursor_pos_y = 0;
 static double delta_x = 0;
 static double delta_y = 0;
 
-//ModelGL* modelGL = NULL;
 int how_many_objs = 0;
-int how_many_objs1 = 0;
 
 const float TRANSLATION_INC = 0.1;
 
@@ -110,6 +108,33 @@ float shiny = 10.0;
 MeshShaderGL *shader;
 
 MousePicker *mousePick;
+
+ModelGL *temp;
+ModelGL *tempMove;
+
+//Create a vector for Actor objs
+vector<Actor*> objFiles;
+
+string fileNameNew;
+char aFileN[64] = "";
+string aFName;
+
+//function finds file name from file path
+string getFileName(const string& s) {
+
+	char sep = '/';
+
+#ifdef _WIN32
+	sep = '\\';
+#endif
+
+	size_t i = s.rfind(sep, s.length());
+	if (i != string::npos) {
+		return(s.substr(i + 1, s.length() - i));
+	}
+
+	return("");
+}
 
 //tinyglft///////////////////////////////////////////////////////////////////////
 static std::string GetFilePathExtension(const std::string& FileName) {
@@ -143,50 +168,107 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
 		switch (key) {
 
-		/*//case GLFW_KEY_SPACE:
-			//modelGL->reset();
-			//break;
+		case GLFW_KEY_SPACE:
+			if (how_many_objs >= 1) {
+				for (int i = 0; i < objFiles.size(); i++) {
+					tempMove = objFiles[i]->returnModelGL();
+					tempMove->reset();
+				}
+			}
+			break;
 
 		case GLFW_KEY_U:
-			modelGL->rotate(5.0f, glm::vec3(0, 0, 1)); //rotate modelGL by positive 5 degrees, z axis
+			if (how_many_objs >= 1) {
+				for (int i = 0; i < objFiles.size(); i++) {
+					tempMove = objFiles[i]->returnModelGL();
+					tempMove->rotate(5.0f, glm::vec3(0, 0, 1)); //rotate modelGL by positive 5 degrees, z axis
+				}
+			}
 			break;
 
 		case GLFW_KEY_O:
-			modelGL->rotate(-5.0f, glm::vec3(0, 0, 1)); //rotate modelGL by negative 5 degrees, z axis
+			if (how_many_objs >= 1) {
+				for (int i = 0; i < objFiles.size(); i++) {
+					tempMove = objFiles[i]->returnModelGL();
+					tempMove->rotate(-5.0f, glm::vec3(0, 0, 1)); //rotate modelGL by negative 5 degrees, z axis
+				}
+			}
 			break;
 
 		case GLFW_KEY_E:
-			modelGL->rotate(5.0f, glm::vec3(1, 0, 0)); //rotate modelGL by positive 5 degrees, x axis
+			if (how_many_objs >= 1) {
+				for (int i = 0; i < objFiles.size(); i++) {
+					tempMove = objFiles[i]->returnModelGL();
+					tempMove->rotate(5.0f, glm::vec3(1, 0, 0)); //rotate modelGL by positive 5 degrees, x axis
+				}
+			}
 			break;
 
 		case GLFW_KEY_R:
-			modelGL->rotate(-5.0f, glm::vec3(1, 0, 0)); //rotate modelGL by negative 5 degrees, x axis
+			if (how_many_objs >= 1) {
+				for (int i = 0; i < objFiles.size(); i++) {
+					tempMove = objFiles[i]->returnModelGL();
+					tempMove->rotate(-5.0f, glm::vec3(1, 0, 0)); //rotate modelGL by negative 5 degrees, x axis
+				}
+			}
 			break;
 
 		case GLFW_KEY_T:
-			modelGL->rotate(5.0f, glm::vec3(0, 1, 0)); //rotate modelGL by positive 5 degrees, y axis
+			if (how_many_objs >= 1) {
+				for (int i = 0; i < objFiles.size(); i++) {
+					tempMove = objFiles[i]->returnModelGL();
+					tempMove->rotate(5.0f, glm::vec3(0, 1, 0)); //rotate modelGL by positive 5 degrees, y axis
+				}
+			}
 			break;
 
 		case GLFW_KEY_Y:
-			modelGL->rotate(-5.0f, glm::vec3(0, 1, 0)); //rotate modelGL by negative 5 degrees, y axis
+			if (how_many_objs >= 1) {
+				for (int i = 0; i < objFiles.size(); i++) {
+					tempMove = objFiles[i]->returnModelGL();
+					tempMove->rotate(-5.0f, glm::vec3(0, 1, 0)); //rotate modelGL by negative 5 degrees, y axis
+				}
+			}
 			break;
 
 		case GLFW_KEY_I:
-			modelGL->translate(glm::vec3(0, TRANSLATION_INC, 0)); //translate modelGL by positive TRANSLATION_INC in Y
+			if (how_many_objs >= 1) {
+				for (int i = 0; i < objFiles.size(); i++) {
+					tempMove = objFiles[i]->returnModelGL();
+					tempMove->translate(glm::vec3(0, TRANSLATION_INC, 0)); //translate modelGL by positive TRANSLATION_INC in Y
+				}
+			}
 			break;
 
 		case GLFW_KEY_K:
-			modelGL->translate(glm::vec3(0, -TRANSLATION_INC, 0)); //translate modelGL by negative TRANSLATION_INC in Y
+			if (how_many_objs >= 1) {
+				for (int i = 0; i < objFiles.size(); i++) {
+					tempMove = objFiles[i]->returnModelGL();
+					tempMove->translate(glm::vec3(0, -TRANSLATION_INC, 0)); //translate modelGL by negative TRANSLATION_INC in Y
+				}
+			}
 			break;
 
 		case GLFW_KEY_L:
-			modelGL->translate(glm::vec3(TRANSLATION_INC, 0, 0)); //translate modelGL by positive TRANSLATION_INC in X
+			if (how_many_objs >= 1) {
+				for (int i = 0; i < objFiles.size(); i++) {
+					tempMove = objFiles[i]->returnModelGL();
+					tempMove->translate(glm::vec3(TRANSLATION_INC, 0, 0)); //translate modelGL by positive TRANSLATION_INC in X
+				}
+			}
 			break;
 
 		case GLFW_KEY_J:
-			modelGL->translate(glm::vec3(-TRANSLATION_INC, 0, 0)); //translate modelGL by negative TRANSLATION_INC in X
-			break;*/
+			if (how_many_objs >= 1) {
+				for (int i = 0; i < objFiles.size(); i++) {
+					tempMove = objFiles[i]->returnModelGL();
+					tempMove->translate(glm::vec3(-TRANSLATION_INC, 0, 0)); //translate modelGL by negative TRANSLATION_INC in X
+				}
+			}
+			break;
 
+
+		//camera keys
 		case GLFW_KEY_W:
 			camera->forward(CAMERA_WALK_SPEED);
 			break;
@@ -251,40 +333,34 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	}
 }
 
-/*// GLFW mouse movement callback
-static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos) {
-	if (firstMouseMove) {
-		mouseX = xpos;
-		mouseY = ypos;
-		firstMouseMove = false;
-	}
-
-	double xDiff = xpos - mouseX;
-	double yDiff = ypos - mouseY;
-
-	xDiff /= framebufferWidth;
-	yDiff /= framebufferHeight;
-
-	camera->rotateRight(-xDiff * CAMERA_ROTATE_SPEED);
-	camera->rotateUp(-yDiff * CAMERA_ROTATE_SPEED);
-
-	mouseX = xpos;
-	mouseY = ypos;
-}*/
-
-/*// GLFW callback mouse button
-static void mouse_button_callback(GLFWwindow* window, int button, int action,
+// GLFW callback mouse button
+/*static void mouse_button_callback(GLFWwindow* window, int button, int action,
 	int mods) {
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-		double x, y;
-		glfwGetCursorPos(window, &x, &y); //get screen coordinates from cursor
-		mousePick->saveCoordX(x);
-		mousePick->saveCoordY(y);
+		double v, w;
+		glfwGetCursorPos(window, &v, &w); //get screen coordinates from cursor
+		mousePick->saveCoordX(v);
+		mousePick->saveCoordY(w);
 		mousePick->updateBufferW(framebufferWidth);
 		mousePick->updateBufferH(framebufferHeight);
 		mousePick->update();
-		cout << "Current Ray: " << glm::to_string(mousePick->getCurrentRay()) << endl;
-				//check for mouse button down then get ray then check for collision then drag object
+		glm::vec3 currentRayAtTheMoment = mousePick->getCurrentRay(); //mouse ray
+		if (how_many_objs >= 1) {
+			for (int i = 0; i < objFiles.size(); i++) {
+				temp = objFiles[i]->returnModelGL();
+				glm::mat4 modelMatrixForTest = temp->getModel(); //object
+				// if the mouse ray is within the object
+				if (currentRayAtTheMoment.x > modelMatrixForTest[0].x && currentRayAtTheMoment.y > modelMatrixForTest[2].y)
+				{
+					if (currentRayAtTheMoment.x < modelMatrixForTest[2].x && currentRayAtTheMoment.y < modelMatrixForTest[2].y)
+					{
+						// then drag by chaning square coordinates relative to mouse
+						sqr->drag(sqr, mouse);
+						glutPostRedisplay();
+					}
+				}
+			}
+		}
 	}
 }*/
 

@@ -79,3 +79,18 @@ glm::vec2 MousePicker::getNormalizedDevCoor(double x1, double y1) {
 	return newVec;
 }
 
+/*
+void MousePicker::intersectionXYPlane(float *worldPos) {
+	float s = -clickPosInWorld.z / direction.z;
+	worldPos[0] = clickPosInWorld.x + direction.x * s;
+	worldPos[1] = clickPosInWorld.y + direction.y * s;
+	worldPos[2] = 0;
+}
+
+glm::vec3 MousePicker::getClickPosInWorld() {
+	return clickPosInWorld;
+}
+glm::vec3 MousePicker::getDirection() {
+	return direction;
+}*/
+

@@ -114,9 +114,10 @@ int main(int argc, char **argv) {
 
 	// State
 	bool show_file_load_window = false;
-	bool save_file_load_window = false;
+	bool show_file_save = false;
 	bool load_an_obj_file = false;
-	bool edit_obj_color = false;
+	bool show_controls = false;
+	bool Scene_Saved = false;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 	/*/////////////////////////////////////////////////////////////////////////////*/
 
@@ -129,31 +130,20 @@ int main(int argc, char **argv) {
 	std::cout << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 
 	// Load shader program
-	shader = new MeshShaderGL("../core/Basic.vs", "../core/Basic.ps", true);
+	shader = new MeshShaderGL("../core/Basic.vs", "../core/Basic.ps", true); //new object, dynamically
+	MeshShaderGL* shaderBox = new MeshShaderGL("../core/Box.vs", "../core/Box.ps", true);
+	//MeshShaderGL tmpModel; static new object
 
 	// Create/Get mesh data	
-	ModelData *modelData = NULL;
-	ModelData *modelData1 = NULL;
-	ModelData *tempModelData1 = NULL;
-	ModelData *tempModelData2 = NULL;
-	MeshShaderGL *tempModelDataGL1 = NULL;
-	MeshShaderGL *tempModelDataGL2 = NULL;
+	ModelData *modelData;
+	ModelData *tempModelData;
 
 	//Create/Get shader data
-	ModelGL *modelGL = NULL;
-	ModelGL *modelGL1 = NULL;
-	ModelGL *temp1 = NULL;
-	ModelGL *temp2 = NULL;
+	ModelGL *modelGL;
 
 	//Collider, Actor
-	Collide *collide1 = NULL;
-	Collide *collide = NULL;
+	Collide *collide;
 	Actor *anActor;
-	Actor *anActor0;
-
-	//Create a vector for Actor objs
-	vector<Actor*> objFiles;
-	vector<Actor*> objFiles1;
 
 	// MousePicker
 	MousePicker *mousePick = new MousePicker(camera);
@@ -176,16 +166,19 @@ int main(int argc, char **argv) {
 			ImGui::Text("%.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
 			ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
 			ImGui::Separator();
-			ImGui::Text("Load");
 			if (ImGui::Button("Load Scene")) {
 				show_file_load_window = true;
 			}
+			if (ImGui::Button("Save Scene")) {
+				show_file_save = true;
+			}
+			ImGui::Separator();
 			if (ImGui::Button("Load Object")) {
 				load_an_obj_file = true;
 			}
 			ImGui::Separator();
-			if (ImGui::Button("Position/Color")) {
-				edit_obj_color = true;
+			if (ImGui::Button("Controls")) {
+				show_controls = true;
 			}
 			ImGui::Separator();
 			ImGui::Text("Change Background Color");
@@ -193,29 +186,102 @@ int main(int argc, char **argv) {
 			ImGui::End();
 		}
 
-		// Edit color of object --------------------------->Still working on this.
-		if (edit_obj_color)
-		{
-			ImGui::Begin("Position/Color", &edit_obj_color);
-			static float rotation = 0.0;
-			ImGui::SliderFloat("rotation", &rotation, 0, 2 * M_PI);
-			static float translation[] = { 0.0, 0.0 };
-			ImGui::SliderFloat2("position", translation, -1.0, 1.0);
-			static float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-			// pass parameters to the shader
-			//shader.setUniform("rotation", rotation);
-			//shader.setUniform("translation", translation[0], translation[1]);
-			// color picker
-			ImGui::ColorEdit3("color", color);
-			// multiply obj's color with this color
-			//shader.setUniform("color", color[0], color[1], color[2]);
+		// Show Controls //////////////////////////////////////////////////////////////////////////////////
+		if (show_controls) {
+			ImGui::Begin("Controls", &show_controls);
+			ImGui::Text("Movement & Camera Controls");
+			ImGui::Separator();
+			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "SPACE"); ImGui::SameLine(); ImGui::TextWrapped("Reset position(s).");
+			ImGui::Spacing();
+			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "U"); ImGui::SameLine(); ImGui::TextWrapped("Rotate by positive 5 degrees, z axis.");
+			ImGui::Spacing();
+			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "O"); ImGui::SameLine(); ImGui::TextWrapped("Rotate by negative 5 degrees, z axis.");
+			ImGui::Spacing();
+			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "E"); ImGui::SameLine(); ImGui::TextWrapped("Rotate by positive 5 degrees, x axis.");
+			ImGui::Spacing();
+			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "R"); ImGui::SameLine(); ImGui::TextWrapped("Rotate by negative 5 degrees, x axis.");
+			ImGui::Spacing();
+			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "T"); ImGui::SameLine(); ImGui::TextWrapped("Rotate by positive 5 degrees, y axis.");
+			ImGui::Spacing();
+			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "Y"); ImGui::SameLine(); ImGui::TextWrapped("Rotate by negative 5 degrees, y axis.");
+			ImGui::Spacing();
+			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "I"); ImGui::SameLine(); ImGui::TextWrapped("Move by positive 0.1 in Y.");
+			ImGui::Spacing();
+			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "K"); ImGui::SameLine(); ImGui::TextWrapped("Move by negative 0.1 in Y.");
+			ImGui::Spacing();
+			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "L"); ImGui::SameLine(); ImGui::TextWrapped("Move by positive 0.1 in X.");
+			ImGui::Spacing();
+			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "J"); ImGui::SameLine(); ImGui::TextWrapped("Move by negative 0.1 in X.");
+			ImGui::Spacing();
+			ImGui::Separator();
+			ImGui::TextColored(ImVec4(2.0f, 0.5f, 1.0f, 1.0f), "W"); ImGui::SameLine(); ImGui::TextWrapped("Move camera forward.");
+			ImGui::Spacing();
+			ImGui::TextColored(ImVec4(2.0f, 0.5f, 1.0f, 1.0f), "S"); ImGui::SameLine(); ImGui::TextWrapped("Move camera back.");
+			ImGui::Spacing();
+			ImGui::TextColored(ImVec4(2.0f, 0.5f, 1.0f, 1.0f), "D"); ImGui::SameLine(); ImGui::TextWrapped("Move camera right.");
+			ImGui::Spacing();
+			ImGui::TextColored(ImVec4(2.0f, 0.5f, 1.0f, 1.0f), "A"); ImGui::SameLine(); ImGui::TextWrapped("Move camera left.");
+			ImGui::Spacing();
+			ImGui::Separator();
+			ImGui::TextColored(ImVec4(0.0f, 0.5f, 1.0f, 1.0f), "C"); ImGui::SameLine(); ImGui::TextWrapped("Turn point light on/off.");
+			ImGui::Spacing();
+			//ImGui::TextColored(ImVec4(0.0f, 0.5f, 1.0f, 1.0f), "0 or 1"); ImGui::SameLine(); ImGui::TextWrapped("Choose material.");
+			//ImGui::Spacing();
+			//ImGui::TextColored(ImVec4(0.0f, 0.5f, 1.0f, 1.0f), "V"); ImGui::SameLine(); ImGui::TextWrapped("Increase shine.");
+			//ImGui::Spacing();
+			//ImGui::TextColored(ImVec4(0.0f, 0.5f, 1.0f, 1.0f), "B"); ImGui::SameLine(); ImGui::TextWrapped("Decrease shine.");
+			//ImGui::Spacing();
+			ImGui::TextColored(ImVec4(0.0f, 0.5f, 1.0f, 1.0f), "N or M"); ImGui::SameLine(); ImGui::TextWrapped("Set object color to white or blue, respectively.");
+			ImGui::Spacing();
+
 			if (ImGui::Button("Close")) {
-				edit_obj_color = false;
+				show_controls = false;
 			}
 			ImGui::End();
 		}
 
-		// Load .obj File
+		// .txt Save a Scene File //////////////////////////////////////////////////////////////////////////////////
+		if (show_file_save)
+		{
+			ImGui::Begin(".txt Scene Saver", &show_file_save);
+			ImGui::Text("Save .txt Scene File");
+			ImGui::Separator();
+			ImGui::Text("Enter file name without extension...");
+			ImGui::InputText("no blank", aFileN, 64, ImGuiInputTextFlags_CharsNoBlank);
+			if (ImGui::Button("Save Scene")) {
+				fileNameNew += aFileN;
+				string newPath = "../" + fileNameNew + ".txt";
+				std::ofstream fs;
+				fs.open(newPath);
+
+				if (!fs)
+				{
+					std::cerr << "Cannot open the output file." << std::endl;
+					return 1;
+				}
+				if (fs.is_open()) {
+					if (how_many_objs >= 1) {
+						for (int i = 0; i < objFiles.size(); i++) {
+							ModelGL* tempModelGLOut = objFiles[i]->returnModelGL();
+							ModelData* tempModelDataOut = objFiles[i]->returnModelData();
+
+							aFName = tempModelDataOut->getFileName();
+							glm::vec3 coordsOut = tempModelGLOut->getCenterofModel();
+
+							fs << aFName << " " << coordsOut.x << " " << coordsOut.y << " " << coordsOut.z << std::endl;
+						}
+					}
+				}
+				fs.close(); 
+			}
+			if (ImGui::Button("Close")) {
+				show_file_save = false;
+				fileNameNew = "";
+			}
+			ImGui::End();
+		}
+
+		// Load .obj File //////////////////////////////////////////////////////////////////////////////////
 		if (load_an_obj_file)
 		{
 			ImGui::Begin("Load .obj", &load_an_obj_file);
@@ -228,16 +294,21 @@ int main(int argc, char **argv) {
 					std::string fileName = fileDialog1.GetSelected().string();
 					ext = GetFilePathExtension(fileName);
 					if (ext == "obj") {
-						string modelFilename1 = fileName;
-						modelData1 = loadModel(modelFilename1);
-							if (!modelData1) {
+						string modelFilename = fileName;
+						modelData = loadModel(modelFilename);
+
+						//save name of model loaded
+						std::string nameForAdding = getFileName(modelFilename);
+						modelData->addFileName(nameForAdding);
+
+							if (!modelData) {
 								std::cout << "ERROR: Failed to set up model data." << endl;
 								glfwTerminate();
 								exit(EXIT_FAILURE);
 							}
 							// increment if object loaded
-							how_many_objs1 = how_many_objs1 + 1;
-							vector<Vertex>* vertices = modelData1->getMesh(0)->getVertices();
+							how_many_objs = how_many_objs + 1;
+							vector<Vertex>* vertices = modelData->getMesh(0)->getVertices();
 							for (int i = 0; i < vertices->size(); i++) {
 								glm::vec3 pos = vertices->at(i).pos;
 								//rescaling
@@ -245,20 +316,20 @@ int main(int argc, char **argv) {
 								pos /= 2.0;
 								vertices->at(i).color = glm::vec4(pos.x, pos.y, pos.z, 1.0);
 							}
-							collide1 = new Collide(modelData1);
-							modelGL1 = new ModelGL(modelData1);
-							anActor = new Actor(modelData1, modelGL1, collide1);
+							collide = new Collide(modelData);
+							modelGL = new ModelGL(modelData);
+							anActor = new Actor(modelData, modelGL, collide);
 							//add Actor obj here
-							objFiles1.push_back(anActor);
-							shader->activate();
+							objFiles.push_back(anActor);
+							/*shader->activate();
 							shader->setShininess(shiny);
 							shader->setMaterialChoice(0);
 							glClearColor(0.0f, 0.0f, 0.7f, 1.0f);
-							glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+							glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
 							//load object at 0, 0, 0 coordinates
-							modelGL1->translate(glm::vec3(0, 0, 0));
-							modelData1 = NULL;
-							modelGL1 = NULL;
+							modelGL->translate(glm::vec3(0, 0, 0));
+							modelData = NULL;
+							modelGL = NULL;
 					}
 					fileDialog1.ClearSelected();
 					load_an_obj_file = false;
@@ -269,7 +340,7 @@ int main(int argc, char **argv) {
 			ImGui::End();
 		}
 
-		//.txt Scene Loader
+		// .txt Scene Loader //////////////////////////////////////////////////////////////////////////////////
 		if (show_file_load_window)
 		{
 			ImGui::Begin(".txt Scene Loader", &show_file_load_window);
@@ -296,9 +367,11 @@ int main(int argc, char **argv) {
 								break; 
 							}
 							// process line (newObj, x, y, z)
+							string newNewObj = newObj; //save object name
 							newObj = extenS + newObj;
-							std::cout << "Loading model: " << newObj << " at: " << x << " " << y << " " << z << endl;
 							modelData = loadModel(newObj);
+							modelData->addFileName(newNewObj); //save name of object loaded
+
 							if (!modelData) {
 								std::cout << "ERROR: Failed to set up model data." << endl;
 								glfwTerminate();
@@ -315,9 +388,9 @@ int main(int argc, char **argv) {
 							}
 							modelGL = new ModelGL(modelData);
 							collide = new Collide(modelData);
-							anActor0 = new Actor(modelData, modelGL, collide);
+							anActor = new Actor(modelData, modelGL, collide);
 							//add Actor obj here
-							objFiles1.push_back(anActor0);
+							objFiles.push_back(anActor);
 							shader->activate();
 							shader->setShininess(shiny);
 							shader->setMaterialChoice(0);
@@ -342,8 +415,13 @@ int main(int argc, char **argv) {
 		// Rendering!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		ImGui::Render();
 		camera->updateBufferSize(framebufferWidth, framebufferHeight);
+		shader->activate();
 		shader->setViewAndProjection(camera);
 		shader->setLight(light);
+		shaderBox->activate();
+		shaderBox->setViewAndProjection(camera);
+		shaderBox->setLight(light);
+		shader->activate();
 
 		//cursor ray
 		double x, y;
@@ -353,7 +431,7 @@ int main(int argc, char **argv) {
 		mousePick->updateBufferW(framebufferWidth);
 		mousePick->updateBufferH(framebufferHeight);
 		mousePick->update();
-		cout << "Current Ray: " << glm::to_string(mousePick->getCurrentRay()) << endl;
+		//cout << "Current Ray: " << glm::to_string(mousePick->getCurrentRay()) << endl;
 
 		/*/////////////////////////////////////////////////////////////////////////////*/
 		int display_w, display_h;
@@ -362,20 +440,15 @@ int main(int argc, char **argv) {
 		glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		/*Draw the mesh using ModelGL's draw() method (passing in the shader)*/
-		if (how_many_objs1 >= 1) {
-			for (int i = 0; i < objFiles1.size(); i++) {
-				temp1 = objFiles1[i]->returnModelGL();
-				temp1->draw(shader);
-				tempModelData1 = objFiles1[i]->returnModelData();
-				tempModelDataGL1->draw_bounds(tempModelData1);
-			}
-		}
+		glLineWidth(10.0);
 		if (how_many_objs >= 1) {
-			for (int i=0; i < objFiles.size(); i++) {
-				temp2 = objFiles[i]->returnModelGL();
-				temp2->draw(shader);
-				tempModelData2 = objFiles1[i]->returnModelData();
-				tempModelDataGL2->draw_bounds(tempModelData2);
+			for (int i = 0; i < objFiles.size(); i++) {
+				temp = objFiles[i]->returnModelGL();
+				shader->activate();
+				temp->draw(shader);
+				tempModelData = objFiles[i]->returnModelData();
+				shaderBox->activate();
+				shaderBox->draw_bounds(tempModelData, temp->getModel());
 			}
 		}
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -386,22 +459,8 @@ int main(int argc, char **argv) {
 	delete shader;
 
 	// Delete/Clear
-	delete modelData1;
-	delete modelData;
-	delete modelGL1;
-	delete modelGL;
-	delete collide;
-	delete collide1;
-	delete anActor;
-	delete anActor0;
-	delete temp1;
-	delete temp2;
-	delete tempModelData1;
-	delete tempModelData2;
-	delete tempModelDataGL1;
-	delete tempModelDataGL2;
+	delete temp;
 	objFiles.clear();
-	objFiles1.clear();
 
 	// Teardown dearimgui
 	ImGui_ImplOpenGL3_Shutdown();

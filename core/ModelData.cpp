@@ -88,3 +88,11 @@ int ModelData::getMaterialIndex(int meshIndex) {
 		return 0;
 	}
 }
+
+void ModelData::addFileName(string m) {
+	aName = m;
+}
+
+string ModelData::getFileName() {
+	return aName;
+}

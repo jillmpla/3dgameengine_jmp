@@ -28,4 +28,8 @@ public:
 	void rotate(float degrees, glm::vec3 axis);
 
 	void reset();
+
+	glm::mat4 getModel();
+
+	glm::vec3 getCenterofModel();
 };
