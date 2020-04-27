@@ -129,7 +129,9 @@ int main(int argc, char **argv) {
 	std::cout << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 
 	// Load shader program
-	shader = new MeshShaderGL("../core/Basic.vs", "../core/Basic.ps", true);
+	shader = new MeshShaderGL("../core/Basic.vs", "../core/Basic.ps", true); //new object, dynamically
+	MeshShaderGL* shaderBox = new MeshShaderGL("../core/Box.vs", "../core/Box.ps", true);
+	//MeshShaderGL tmpModel; static new object
 
 	// Create/Get mesh data	
 	ModelData *modelData = NULL;
@@ -342,8 +344,13 @@ int main(int argc, char **argv) {
 		// Rendering!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		ImGui::Render();
 		camera->updateBufferSize(framebufferWidth, framebufferHeight);
+		shader->activate();
 		shader->setViewAndProjection(camera);
 		shader->setLight(light);
+		shaderBox->activate();
+		shaderBox->setViewAndProjection(camera);
+		shaderBox->setLight(light);
+		shader->activate();
 
 		//cursor ray
 		double x, y;
@@ -362,22 +369,25 @@ int main(int argc, char **argv) {
 		glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		/*Draw the mesh using ModelGL's draw() method (passing in the shader)*/
+		glLineWidth(10.0);
 		if (how_many_objs1 >= 1) {
 			for (int i = 0; i < objFiles1.size(); i++) {
 				temp1 = objFiles1[i]->returnModelGL();
+				shader->activate();
 				temp1->draw(shader);
 				tempModelData1 = objFiles1[i]->returnModelData();
-				tempModelDataGL1->draw_bounds(tempModelData1);
+				shaderBox->activate();
+				shaderBox->draw_bounds(tempModelData1, temp1->getModel());
 			}
 		}
-		if (how_many_objs >= 1) {
+		/*if (how_many_objs == 1) {
 			for (int i=0; i < objFiles.size(); i++) {
 				temp2 = objFiles[i]->returnModelGL();
 				temp2->draw(shader);
-				tempModelData2 = objFiles1[i]->returnModelData();
-				tempModelDataGL2->draw_bounds(tempModelData2);
+				tempModelData2 = objFiles[i]->returnModelData();
+				shaderBox->draw_bounds(tempModelData2);
 			}
-		}
+		}*/
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwSwapBuffers(window);
 	}
@@ -392,8 +402,8 @@ int main(int argc, char **argv) {
 	delete modelGL;
 	delete collide;
 	delete collide1;
-	delete anActor;
-	delete anActor0;
+	//delete anActor;
+	//delete anActor0;
 	delete temp1;
 	delete temp2;
 	delete tempModelData1;

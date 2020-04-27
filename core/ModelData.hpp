@@ -4,8 +4,8 @@
 #include "MeshData.hpp"
 #include "TextureData.hpp"
 #include "MaterialData.hpp"
-#include "ModelGL.hpp"
-#include "MeshShaderGL.hpp"
+//#include "ModelGL.hpp"
+//#include "MeshShaderGL.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/matrix_transform.hpp>
 
