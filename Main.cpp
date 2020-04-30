@@ -60,10 +60,10 @@ int main(int argc, char **argv) {
 	glfwSetKeyCallback(window, key_callback);
 	
 	// Set our mouse callback function for when the mouse MOVES
-	//glfwSetCursorPosCallback(window, mouse_position_callback);
+	glfwSetCursorPosCallback(window, mouse_position_callback);
 
 	// Set our mouse BUTTON callback function
-	//glfwSetMouseButtonCallback(window, mouse_button_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 	// Set our callback for when the window changes size
 	glfwSetWindowSizeCallback(window, window_size_callback);

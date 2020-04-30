@@ -107,13 +107,15 @@ float shiny = 10.0;
 
 MeshShaderGL *shader;
 
-MousePicker *mousePick;
+MousePicker* mousePick = new MousePicker(camera);
 
 ModelGL *temp;
 ModelGL *tempMove;
 
 //Create a vector for Actor objs
 vector<Actor*> objFiles;
+
+bool rightMouseDown = false;
 
 string fileNameNew;
 char aFileN[64] = "";
@@ -333,10 +335,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	}
 }
 
-// GLFW callback mouse button
-/*static void mouse_button_callback(GLFWwindow* window, int button, int action,
-	int mods) {
-	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+// GLFW callback mouse position
+static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos) {
+	if (rightMouseDown == true) {
 		double v, w;
 		glfwGetCursorPos(window, &v, &w); //get screen coordinates from cursor
 		mousePick->saveCoordX(v);
@@ -346,9 +347,10 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		mousePick->update();
 		glm::vec3 currentRayAtTheMoment = mousePick->getCurrentRay(); //mouse ray
 		if (how_many_objs >= 1) {
-			for (int i = 0; i < objFiles.size(); i++) {
+			/*for (int i = 0; i < objFiles.size(); i++) {
 				temp = objFiles[i]->returnModelGL();
 				glm::mat4 modelMatrixForTest = temp->getModel(); //object
+				glm::vec3 localRay = glm::vec3(glm::inverse(modelMatrixForTest) * glm::vec4(currentRayAtTheMoment, 0));
 				// if the mouse ray is within the object
 				if (currentRayAtTheMoment.x > modelMatrixForTest[0].x && currentRayAtTheMoment.y > modelMatrixForTest[2].y)
 				{
@@ -359,10 +361,23 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 						glutPostRedisplay();
 					}
 				}
-			}
+			}*/
+			temp = objFiles[0]->returnModelGL();
+			temp->translate(currentRayAtTheMoment);
+			cout << "RAY:" << glm::to_string(currentRayAtTheMoment) << endl;
 		}
 	}
-}*/
+}
+
+// GLFW callback mouse button
+static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+		rightMouseDown = true;
+	}
+	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+		rightMouseDown = false;
+	}
+}
 
 // GLFW callback when the window changes size
 void window_size_callback(GLFWwindow* window, int width, int height) {
