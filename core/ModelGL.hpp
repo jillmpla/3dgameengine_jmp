@@ -30,6 +30,9 @@ public:
 	void reset();
 
 	glm::mat4 getModel();
+<<<<<<< HEAD
 
 	glm::vec3 getCenterofModel();
+=======
+>>>>>>> master
 };

@@ -441,6 +441,7 @@ int main(int argc, char **argv) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		/*Draw the mesh using ModelGL's draw() method (passing in the shader)*/
 		glLineWidth(10.0);
+<<<<<<< HEAD
 		if (how_many_objs >= 1) {
 			for (int i = 0; i < objFiles.size(); i++) {
 				temp = objFiles[i]->returnModelGL();
@@ -449,8 +450,26 @@ int main(int argc, char **argv) {
 				tempModelData = objFiles[i]->returnModelData();
 				shaderBox->activate();
 				shaderBox->draw_bounds(tempModelData, temp->getModel());
+=======
+		if (how_many_objs1 >= 1) {
+			for (int i = 0; i < objFiles1.size(); i++) {
+				temp1 = objFiles1[i]->returnModelGL();
+				shader->activate();
+				temp1->draw(shader);
+				tempModelData1 = objFiles1[i]->returnModelData();
+				shaderBox->activate();
+				shaderBox->draw_bounds(tempModelData1, temp1->getModel());
 			}
 		}
+		/*if (how_many_objs == 1) {
+			for (int i=0; i < objFiles.size(); i++) {
+				temp2 = objFiles[i]->returnModelGL();
+				temp2->draw(shader);
+				tempModelData2 = objFiles[i]->returnModelData();
+				shaderBox->draw_bounds(tempModelData2);
+>>>>>>> master
+			}
+		}*/
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwSwapBuffers(window);
 	}
@@ -459,7 +478,24 @@ int main(int argc, char **argv) {
 	delete shader;
 
 	// Delete/Clear
+<<<<<<< HEAD
 	delete temp;
+=======
+	delete modelData1;
+	delete modelData;
+	delete modelGL1;
+	delete modelGL;
+	delete collide;
+	delete collide1;
+	//delete anActor;
+	//delete anActor0;
+	delete temp1;
+	delete temp2;
+	delete tempModelData1;
+	delete tempModelData2;
+	delete tempModelDataGL1;
+	delete tempModelDataGL2;
+>>>>>>> master
 	objFiles.clear();
 
 	// Teardown dearimgui
