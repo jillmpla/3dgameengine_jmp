@@ -117,7 +117,6 @@ int main(int argc, char **argv) {
 	bool show_file_save = false;
 	bool load_an_obj_file = false;
 	bool show_controls = false;
-	bool Scene_Saved = false;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 	/*/////////////////////////////////////////////////////////////////////////////*/
 
@@ -132,7 +131,6 @@ int main(int argc, char **argv) {
 	// Load shader program
 	shader = new MeshShaderGL("../core/Basic.vs", "../core/Basic.ps", true); //new object, dynamically
 	MeshShaderGL* shaderBox = new MeshShaderGL("../core/Box.vs", "../core/Box.ps", true);
-	//MeshShaderGL tmpModel; static new object
 
 	// Create/Get mesh data	
 	ModelData *modelData;
@@ -191,7 +189,7 @@ int main(int argc, char **argv) {
 			ImGui::Begin("Controls", &show_controls);
 			ImGui::Text("Movement & Camera Controls");
 			ImGui::Separator();
-			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "SPACE"); ImGui::SameLine(); ImGui::TextWrapped("Reset position(s).");
+			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "SPACE"); ImGui::SameLine(); ImGui::TextWrapped("Reset position(s) to 0,0,0.");
 			ImGui::Spacing();
 			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "U"); ImGui::SameLine(); ImGui::TextWrapped("Rotate by positive 5 degrees, z axis.");
 			ImGui::Spacing();
