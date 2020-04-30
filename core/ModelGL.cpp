@@ -64,13 +64,10 @@ void ModelGL::reset() {
 	modelMatrix = glm::mat4(1.0f);
 }
 
-<<<<<<< HEAD
 glm::vec3 ModelGL::getCenterofModel() {
 	return centerofModel;
 }
 
-=======
->>>>>>> master
 glm::mat4 ModelGL::getModel() {
 	return modelMatrix;
 }

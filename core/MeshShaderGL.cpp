@@ -77,11 +77,7 @@ void MeshShaderGL::createBoundingBox() {
 
     glGenBuffers(1, &bound_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, bound_VBO);
-<<<<<<< HEAD
     glBufferData(GL_ARRAY_BUFFER, sizeof(float)*48, vertices1, GL_STATIC_DRAW); //32
-=======
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*32, vertices1, GL_STATIC_DRAW);
->>>>>>> master
     
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0);
@@ -96,11 +92,7 @@ void MeshShaderGL::createBoundingBox() {
     
     glGenBuffers(1, &bound_EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bound_EBO);
-<<<<<<< HEAD
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*16, elements, GL_STATIC_DRAW); //16
-=======
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*16, elements, GL_STATIC_DRAW); 
->>>>>>> master
 }
 
 void MeshShaderGL::cleanupBoundingBox() {
@@ -111,14 +103,8 @@ void MeshShaderGL::cleanupBoundingBox() {
 	glDeleteVertexArrays(1, &bound_VAO);
 }
 
-<<<<<<< HEAD
 void MeshShaderGL::draw_bounds(ModelData *tempMD, glm::mat4 mainModelMatrix) {
     // size and position of bounding box
-=======
-//draw bounding box around obj/////////////////////////////////////////////////////////////////////
-void MeshShaderGL::draw_bounds(ModelData *tempMD, glm::mat4 mainModelMatrix) {
-    // THIS IS THE PART THAT FIGURES OUT WHAT THE SIZE AND POSITION OF THE BOUNDING BOX IS
->>>>>>> master
     GLfloat
         min_x, max_x,
         min_y, max_y,
@@ -148,10 +134,6 @@ void MeshShaderGL::draw_bounds(ModelData *tempMD, glm::mat4 mainModelMatrix) {
     glUniformMatrix4fv(modelMatLoc, 1, GL_FALSE, glm::value_ptr(transform));
 
     glBindVertexArray(bound_VAO);
-<<<<<<< HEAD
 	glDrawElements(GL_LINE_LOOP, 16, GL_UNSIGNED_INT, (void*)0); //16
-=======
-	glDrawElements(GL_LINES, 16, GL_UNSIGNED_INT, (void*)0);
->>>>>>> master
 	glBindVertexArray(0);
 }
