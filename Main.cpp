@@ -15,6 +15,10 @@ int main(int argc, char **argv) {
 	fileDialog1.SetTitle("Load .obj");
 	fileDialog1.SetTypeFilters({ ".obj" });
 
+	ImGui::FileBrowser fileDialog2;
+	fileDialog2.SetTitle("Load .wav or .mp3");
+	fileDialog2.SetTypeFilters({ ".wav", ".mp3" });
+
 	// GLFW setup //
 	
 	// Set error callback
@@ -117,6 +121,11 @@ int main(int argc, char **argv) {
 	bool show_file_save = false;
 	bool load_an_obj_file = false;
 	bool show_controls = false;
+	bool add_sound = false;
+	bool stop_all_sounds = false;
+	bool volumeDown = false;
+	bool volumeUp = false;
+	bool pauseSound = false;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 	/*/////////////////////////////////////////////////////////////////////////////*/
 
@@ -142,9 +151,6 @@ int main(int argc, char **argv) {
 	//Collider, Actor
 	Collide *collide;
 	Actor *anActor;
-
-	// MousePicker
-	MousePicker *mousePick = new MousePicker(camera);
 
 	// Enable depth testing
 	glEnable(GL_DEPTH_TEST);
@@ -179,8 +185,125 @@ int main(int argc, char **argv) {
 				show_controls = true;
 			}
 			ImGui::Separator();
-			ImGui::Text("Change Background Color");
+			if (ImGui::Button("Add Sound")) {
+				add_sound = true;
+			}
+			if (ImGui::Button("Volume Up")) {
+				volumeUp = true;
+			}
+			if (ImGui::Button("Volume Down")) {
+				volumeDown = true;
+			}
+			if (ImGui::Button("Pause All Sound")) {
+				pauseSound = true;
+			}
+			if (ImGui::Button("Stop All Sound")) {
+				stop_all_sounds = true;
+			}
+			ImGui::Separator();
+			ImGui::TextWrapped("Change Background Color");
 			ImGui::ColorEdit3("Color", (float*)&clear_color); 
+			ImGui::End();
+		}
+
+		// Add Sound //////////////////////////////////////////////////////////////////////////////////
+		if (add_sound) {
+			ImGui::Begin("Add Sound", &add_sound);
+			ImGui::TextWrapped("Add a .wav or .mp3:");
+			if (ImGui::Button("Open")) 
+				fileDialog2.Open();
+				fileDialog2.Display();
+				if (fileDialog2.HasSelected())
+				{
+					std::string fileNameSound = fileDialog2.GetSelected().string();
+					ext = GetFilePathExtension(fileNameSound);
+					if (ext == "wav" || ext == "mp3") {
+						string soundFile = fileNameSound; //file path
+						Sound* aNewSound = new Sound(soundFile); //new Sound obj with sound file
+						soundFiles.push_back(aNewSound); //add new Sound obj to vector of all sounds
+						num_sound_objs = num_sound_objs + 1;
+					}
+					fileDialog2.ClearSelected();
+					add_sound = false;
+				}
+			if (ImGui::Button("Close")) {
+				add_sound = false;
+			}
+			ImGui::End();
+		}
+
+		// Stop All Sound //////////////////////////////////////////////////////////////////////////////////
+		if (stop_all_sounds) {
+			ImGui::Begin("Stop All Sound", &stop_all_sounds);
+			ImGui::TextWrapped("Stop All Sound:");
+			if (ImGui::Button("Stop")) {
+				if (num_sound_objs >= 1) {
+					for (int i = 0; i < soundFiles.size(); i++) {
+						soundFiles[i]->stopsound();
+					}
+				}
+			}
+			if (ImGui::Button("Close")) {
+				stop_all_sounds = false;
+			}
+			ImGui::End();
+		}
+
+		// Volume Up //////////////////////////////////////////////////////////////////////////////////
+		if (volumeUp) {
+			ImGui::Begin("Turn Volume Up", &volumeUp);
+			ImGui::TextWrapped("Increase Sound Volume:");
+			if (ImGui::Button("Volume Up")) {
+				if (num_sound_objs >= 1) {
+					for (int i = 0; i < soundFiles.size(); i++) {
+						soundFiles[i]->turnUpVolume();
+					}
+				}
+			}
+			if (ImGui::Button("Close")) {
+				volumeUp = false;
+			}
+			ImGui::End();
+		}
+
+		// Volume Down //////////////////////////////////////////////////////////////////////////////////
+		if (volumeDown) {
+			ImGui::Begin("Turn Volume Down", &volumeDown);
+			ImGui::TextWrapped("Decrease Sound Volume:");
+			if (ImGui::Button("Volume Down")) {
+				if (num_sound_objs >= 1) {
+					for (int i = 0; i < soundFiles.size(); i++) {
+						soundFiles[i]->turnDownVolume();
+					}
+				}
+			}
+			if (ImGui::Button("Close")) {
+				volumeDown = false;
+			}
+			ImGui::End();
+		}
+
+		// Pause Sound //////////////////////////////////////////////////////////////////////////////////
+		if (pauseSound) {
+			ImGui::Begin("Pause/Unpause", &pauseSound);
+			ImGui::TextWrapped("Pause or Unpause Sound:");
+			if (ImGui::Button("Pause")) {
+				if (num_sound_objs >= 1) {
+					for (int i = 0; i < soundFiles.size(); i++) {
+						soundFiles[i]->pausesound();
+					}
+				}
+			}
+			if (ImGui::Button("Unpause")) {
+				if (num_sound_objs >= 1) {
+					for (int i = 0; i < soundFiles.size(); i++) {
+						soundFiles[i]->unpausesound();
+					}
+				}
+			}
+			if (ImGui::Button("Close")) {
+				pauseSound = false;
+			}
 			ImGui::End();
 		}
 
@@ -242,9 +365,9 @@ int main(int argc, char **argv) {
 		if (show_file_save)
 		{
 			ImGui::Begin(".txt Scene Saver", &show_file_save);
-			ImGui::Text("Save .txt Scene File");
+			ImGui::TextWrapped("Save .txt Scene File");
 			ImGui::Separator();
-			ImGui::Text("Enter file name without extension...");
+			ImGui::TextWrapped("Enter file name without extension...");
 			ImGui::InputText("no blank", aFileN, 64, ImGuiInputTextFlags_CharsNoBlank);
 			if (ImGui::Button("Save Scene")) {
 				fileNameNew += aFileN;
@@ -283,7 +406,7 @@ int main(int argc, char **argv) {
 		if (load_an_obj_file)
 		{
 			ImGui::Begin("Load .obj", &load_an_obj_file);
-			ImGui::Text("Open .obj File:");
+			ImGui::TextWrapped("Open .obj File:");
 			if (ImGui::Button("Open File"))
 				fileDialog1.Open();
 				fileDialog1.Display();
@@ -319,11 +442,11 @@ int main(int argc, char **argv) {
 							anActor = new Actor(modelData, modelGL, collide);
 							//add Actor obj here
 							objFiles.push_back(anActor);
-							/*shader->activate();
+							shader->activate();
 							shader->setShininess(shiny);
 							shader->setMaterialChoice(0);
 							glClearColor(0.0f, 0.0f, 0.7f, 1.0f);
-							glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
+							glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 							//load object at 0, 0, 0 coordinates
 							modelGL->translate(glm::vec3(0, 0, 0));
 							modelData = NULL;
@@ -342,7 +465,7 @@ int main(int argc, char **argv) {
 		if (show_file_load_window)
 		{
 			ImGui::Begin(".txt Scene Loader", &show_file_load_window);
-			ImGui::Text("Open .txt Scene File:");
+			ImGui::TextWrapped("Open .txt Scene File:");
 			if (ImGui::Button("Open File"))
 				fileDialog.Open();
 				fileDialog.Display();
@@ -455,9 +578,10 @@ int main(int argc, char **argv) {
 
 	// Cleanup		
 	delete shader;
-
-	// Delete/Clear
 	delete temp;
+	delete mousePick;
+	delete camera;
+	soundFiles.clear();
 	objFiles.clear();
 
 	// Teardown dearimgui

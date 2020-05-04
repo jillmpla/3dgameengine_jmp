@@ -1,3 +1,9 @@
+/*/////////////////////////////////////////////////////////////////////////////
+NOTE:
+Add a copy of [irrKlang.dll] and [ikpMP3.dll] from libs/irrKlang to the build 
+folder for Visual Studio to run/debug with sound/music feature.
+/////////////////////////////////////////////////////////////////////////////*/
+
 //C++
 #include <cstdio>
 #include <iostream>
@@ -35,6 +41,7 @@
 #include "core/MousePicker.hpp"
 #include "physics/Collide.hpp"
 #include "physics/Actor.hpp"
+#include "sound/Sound.hpp"
 /*Dear ImGui*/
 #include "libs/dearimgui/imgui.h"
 #include "libs/dearimgui/imgui_impl_glfw.h"
@@ -80,6 +87,7 @@ static double delta_x = 0;
 static double delta_y = 0;
 
 int how_many_objs = 0;
+int num_sound_objs = 0;
 
 const float TRANSLATION_INC = 0.1;
 
@@ -114,6 +122,9 @@ ModelGL *tempMove;
 
 //Create a vector for Actor objs
 vector<Actor*> objFiles;
+
+//Sound
+vector<Sound*> soundFiles;
 
 bool rightMouseDown = false;
 
@@ -364,7 +375,6 @@ static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos
 			}*/
 			temp = objFiles[0]->returnModelGL();
 			temp->translate(currentRayAtTheMoment);
-			cout << "RAY:" << glm::to_string(currentRayAtTheMoment) << endl;
 		}
 	}
 }

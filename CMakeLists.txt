@@ -30,6 +30,7 @@ set(CMAKE_PREFIX_PATH ${MASTER_DEPEND} ${CMAKE_PREFIX_PATH})
 # - GLM
 # - Assimp (static)
 # INTERNALLY INCLUDES -
+# - irrKlang 1.6.0 - https://www.ambiera.com/irrklang
 # - DearImgui - https://github.com/ocornut/imgui
 # - json.hpp - https://github.com/nlohmann/json
 # - tiny_gltf.h - https://github.com/syoyo/tinygltf
@@ -126,6 +127,8 @@ file(GLOB GENERAL_SOURCES
        ${PROJECT_SOURCE_DIR}/*.cpp
        ${PROJECT_SOURCE_DIR}/*.hpp
        ${PROJECT_SOURCE_DIR}/*.h
+       ${PROJECT_SOURCE_DIR}/*.wav
+       ${PROJECT_SOURCE_DIR}/*.mp3
        ${PROJECT_SOURCE_DIR}/core/*.cpp
        ${PROJECT_SOURCE_DIR}/core/*.hpp
        ${PROJECT_SOURCE_DIR}/core/*.h
@@ -137,7 +140,17 @@ file(GLOB GENERAL_SOURCES
        ${PROJECT_SOURCE_DIR}/libs/*.h
        ${PROJECT_SOURCE_DIR}/libs/dearimgui/*.cpp
        ${PROJECT_SOURCE_DIR}/libs/dearimgui/*.hpp
-       ${PROJECT_SOURCE_DIR}/libs/dearimgui/*.h)
+       ${PROJECT_SOURCE_DIR}/libs/dearimgui/*.h
+       ${PROJECT_SOURCE_DIR}/libs/irrKlang/*.cpp
+       ${PROJECT_SOURCE_DIR}/libs/irrKlang/*.c
+       ${PROJECT_SOURCE_DIR}/libs/irrKlang/*.hpp
+       ${PROJECT_SOURCE_DIR}/libs/irrKlang/*.h
+       ${PROJECT_SOURCE_DIR}/libs/irrKlang/*.dll
+       ${PROJECT_SOURCE_DIR}/libs/irrKlang/*.exp
+       ${PROJECT_SOURCE_DIR}/libs/irrKlang/*.lib
+       ${PROJECT_SOURCE_DIR}/sound/*.cpp
+       ${PROJECT_SOURCE_DIR}/sound/*.hpp
+       ${PROJECT_SOURCE_DIR}/sound/*.h)
 
 #####################################
 # Set general libraries
