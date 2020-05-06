@@ -178,6 +178,8 @@ int main(int argc, char **argv) {
 		// Add Sound //////////////////////////////////////////////////////////////////////////////////
 		if (add_sound) {
 			ImGui::Begin("Add Sound", &add_sound);
+			ImGui::Separator();
+			ImGui::Separator();
 			ImGui::TextWrapped("Add a .wav or .mp3:");
 			if (ImGui::Button("Open")) 
 				fileDialog2.Open();
@@ -195,6 +197,8 @@ int main(int argc, char **argv) {
 					fileDialog2.ClearSelected();
 					add_sound = false;
 				}
+			ImGui::Separator();
+			ImGui::Separator();
 			if (ImGui::Button("Close")) {
 				add_sound = false;
 			}
@@ -204,6 +208,8 @@ int main(int argc, char **argv) {
 		// Stop All Sound //////////////////////////////////////////////////////////////////////////////////
 		if (stop_all_sounds) {
 			ImGui::Begin("Stop All Sound", &stop_all_sounds);
+			ImGui::Separator();
+			ImGui::Separator();
 			ImGui::TextWrapped("Stop All Sound:");
 			if (ImGui::Button("Stop")) {
 				if (num_sound_objs >= 1) {
@@ -212,6 +218,8 @@ int main(int argc, char **argv) {
 					}
 				}
 			}
+			ImGui::Separator();
+			ImGui::Separator();
 			if (ImGui::Button("Close")) {
 				stop_all_sounds = false;
 			}
@@ -221,6 +229,8 @@ int main(int argc, char **argv) {
 		// Volume Up //////////////////////////////////////////////////////////////////////////////////
 		if (volumeUp) {
 			ImGui::Begin("Turn Volume Up", &volumeUp);
+			ImGui::Separator();
+			ImGui::Separator();
 			ImGui::TextWrapped("Increase Sound Volume:");
 			if (ImGui::Button("Volume Up")) {
 				if (num_sound_objs >= 1) {
@@ -229,6 +239,8 @@ int main(int argc, char **argv) {
 					}
 				}
 			}
+			ImGui::Separator();
+			ImGui::Separator();
 			if (ImGui::Button("Close")) {
 				volumeUp = false;
 			}
@@ -238,6 +250,8 @@ int main(int argc, char **argv) {
 		// Volume Down //////////////////////////////////////////////////////////////////////////////////
 		if (volumeDown) {
 			ImGui::Begin("Turn Volume Down", &volumeDown);
+			ImGui::Separator();
+			ImGui::Separator();
 			ImGui::TextWrapped("Decrease Sound Volume:");
 			if (ImGui::Button("Volume Down")) {
 				if (num_sound_objs >= 1) {
@@ -246,6 +260,8 @@ int main(int argc, char **argv) {
 					}
 				}
 			}
+			ImGui::Separator();
+			ImGui::Separator();
 			if (ImGui::Button("Close")) {
 				volumeDown = false;
 			}
@@ -255,6 +271,8 @@ int main(int argc, char **argv) {
 		// Pause Sound //////////////////////////////////////////////////////////////////////////////////
 		if (pauseSound) {
 			ImGui::Begin("Pause/Unpause", &pauseSound);
+			ImGui::Separator();
+			ImGui::Separator();
 			ImGui::TextWrapped("Pause or Unpause Sound:");
 			if (ImGui::Button("Pause")) {
 				if (num_sound_objs >= 1) {
@@ -270,6 +288,8 @@ int main(int argc, char **argv) {
 					}
 				}
 			}
+			ImGui::Separator();
+			ImGui::Separator();
 			if (ImGui::Button("Close")) {
 				pauseSound = false;
 			}
@@ -280,6 +300,8 @@ int main(int argc, char **argv) {
 		if (adjust_specific_sound)
 		{
 			ImGui::Begin("Adjust Specific Sound", &adjust_specific_sound);
+			ImGui::Separator();
+			ImGui::Separator();
 			ImGui::TextWrapped("Enter sound name (without extension, case sensitive)...");
 			ImGui::InputText("no blank", aFileN1, 64, ImGuiInputTextFlags_CharsNoBlank);
 			if (ImGui::Button("Select Sound")) {
@@ -342,13 +364,13 @@ int main(int argc, char **argv) {
 			ImGui::Spacing();
 			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "O"); ImGui::SameLine(); ImGui::TextWrapped("Rotate by negative 5 degrees, z axis.");
 			ImGui::Spacing();
-			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "I"); ImGui::SameLine(); ImGui::TextWrapped("Move by positive 0.1 in Y.");
+			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "I"); ImGui::SameLine(); ImGui::TextWrapped("Move by positive 0.1 in y.");
 			ImGui::Spacing();
-			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "K"); ImGui::SameLine(); ImGui::TextWrapped("Move by negative 0.1 in Y.");
+			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "K"); ImGui::SameLine(); ImGui::TextWrapped("Move by negative 0.1 in y.");
 			ImGui::Spacing();
-			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "L"); ImGui::SameLine(); ImGui::TextWrapped("Move by positive 0.1 in X.");
+			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "L"); ImGui::SameLine(); ImGui::TextWrapped("Move by positive 0.1 in x.");
 			ImGui::Spacing();
-			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "J"); ImGui::SameLine(); ImGui::TextWrapped("Move by negative 0.1 in X.");
+			ImGui::TextColored(ImVec4(0.5f, 0.0f, 1.0f, 1.0f), "J"); ImGui::SameLine(); ImGui::TextWrapped("Move by negative 0.1 in x.");
 			ImGui::Spacing();
 			ImGui::Separator();
 			ImGui::Separator();
@@ -383,9 +405,9 @@ int main(int argc, char **argv) {
 		if (show_file_save)
 		{
 			ImGui::Begin(".txt Scene Saver", &show_file_save);
+			ImGui::Separator();
+			ImGui::Separator();
 			ImGui::TextWrapped("Save .txt Scene File");
-			ImGui::Separator();
-			ImGui::Separator();
 			ImGui::TextWrapped("Enter file name (without extension)...");
 			ImGui::InputText("no blank", aFileN, 64, ImGuiInputTextFlags_CharsNoBlank);
 			if (ImGui::Button("Save Scene")) {
@@ -427,6 +449,8 @@ int main(int argc, char **argv) {
 		if (load_an_obj_file)
 		{
 			ImGui::Begin("Load .obj", &load_an_obj_file);
+			ImGui::Separator();
+			ImGui::Separator();
 			ImGui::TextWrapped("Open .obj File:");
 			if (ImGui::Button("Open File"))
 				fileDialog1.Open();
@@ -473,6 +497,8 @@ int main(int argc, char **argv) {
 					fileDialog1.ClearSelected();
 					load_an_obj_file = false;
 				}
+			ImGui::Separator();
+			ImGui::Separator();
 			if (ImGui::Button("Close")) {
 				load_an_obj_file = false;
 			}
@@ -483,6 +509,8 @@ int main(int argc, char **argv) {
 		if (show_file_load_window)
 		{
 			ImGui::Begin(".txt Scene Loader", &show_file_load_window);
+			ImGui::Separator();
+			ImGui::Separator();
 			ImGui::TextWrapped("Open .txt Scene File:");
 			if (ImGui::Button("Open File"))
 				fileDialog.Open();
@@ -544,6 +572,8 @@ int main(int argc, char **argv) {
 					fileDialog.ClearSelected();
 					show_file_load_window = false;
 				}
+				ImGui::Separator();
+				ImGui::Separator();
 				if (ImGui::Button("Close")) {
 					show_file_load_window = false;
 				}
