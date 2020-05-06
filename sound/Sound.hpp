@@ -19,4 +19,5 @@ public:
 	void Sound::turnDownVolume();
 	void Sound::pausesound();
 	void Sound::unpausesound();
+	std::string Sound::getnewSound();
 };

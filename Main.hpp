@@ -112,15 +112,28 @@ bool isPtLt = true;
 Light* light = new Light(pos1, color1, isPtLt);
 
 float shiny = 10.0;
+int materialCh = 0;
 
 MeshShaderGL *shader;
+MeshShaderGL* shaderBox;
+
+// Create/Get mesh data	
+ModelData* modelData;
+ModelData* tempModelData;
+
+//Create/Get shader data
+ModelGL* modelGL;
+
+//Collider, Actor
+Collide* collide;
+Actor* anActor;
 
 MousePicker* mousePick = new MousePicker(camera);
 
 ModelGL *temp;
 ModelGL *tempMove;
 
-//Create a vector for Actor objs
+//Actor objs
 vector<Actor*> objFiles;
 
 //Sound
@@ -129,8 +142,24 @@ vector<Sound*> soundFiles;
 bool rightMouseDown = false;
 
 string fileNameNew;
+string fileNameNew1;
 char aFileN[64] = "";
+char aFileN1[64] = "";
 string aFName;
+int locationOfSpecificSound;
+
+// State
+bool show_file_load_window = false;
+bool show_file_save = false;
+bool load_an_obj_file = false;
+bool show_controls = false;
+bool add_sound = false;
+bool stop_all_sounds = false;
+bool volumeDown = false;
+bool volumeUp = false;
+bool pauseSound = false;
+bool adjust_specific_sound = false;
+ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 //function finds file name from file path
 string getFileName(const string& s) {
@@ -280,7 +309,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			}
 			break;
 
-
 		//camera keys
 		case GLFW_KEY_W:
 			camera->forward(CAMERA_WALK_SPEED);
@@ -298,6 +326,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			camera->strafeRight(-CAMERA_WALK_SPEED);
 			break;
 
+		//extra
 		case GLFW_KEY_C:
 			if (light->getIsPointLight()) {
 				light->setIsPointLight(false);
@@ -308,17 +337,20 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			break;
 
 		case GLFW_KEY_0:
-			shader->setMaterialChoice(0);
+			materialCh = 0;
+			shader->setMaterialChoice(materialCh);
 			break;
-
+		
+		//////////////////////////original look//////////////////////////
 		case GLFW_KEY_1:
-			shader->setMaterialChoice(1);
+			materialCh = 1;
+			shader->setMaterialChoice(materialCh);
 			break;
+		/////////////////////////////////////////////////////////////////
 
 		case GLFW_KEY_V:
 			shiny *= 5.0;
 			shader->setShininess(shiny);
-
 			break;
 
 		case GLFW_KEY_B:
@@ -335,10 +367,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			light->setColor(blue1); //blue
 			break;
 
+		//////////////////////////original look//////////////////////////
 		case GLFW_KEY_M:
 			glm::vec3 white1 = glm::vec3(1, 1, 1);
-			light->setColor(white1); //white
+			light->setColor(white1);
 			break;
+		/////////////////////////////////////////////////////////////////
 
 		default:
 			break;
@@ -373,6 +407,7 @@ static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos
 					}
 				}
 			}*/
+			//////////////////////////////////////////////////////// try snapping camera to object
 			temp = objFiles[0]->returnModelGL();
 			temp->translate(currentRayAtTheMoment);
 		}

@@ -40,3 +40,7 @@ void Sound::turnDownVolume() {
 	}
 	engine->setSoundVolume(currentVolume);
 }
+
+std::string Sound::getnewSound() {
+	return newSound;
+}
