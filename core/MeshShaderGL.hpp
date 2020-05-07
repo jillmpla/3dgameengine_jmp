@@ -20,7 +20,7 @@ public:
 
 	void createBoundingBox();	
 	void cleanupBoundingBox();
-	void draw_bounds(ModelData *tempMD, glm::mat4 mainModelMatrix);
+	void MeshShaderGL::draw_bounds(glm::mat4 transform);
 
 private:
 	GLint modelMatLoc = -1;

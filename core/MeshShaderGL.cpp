@@ -103,37 +103,10 @@ void MeshShaderGL::cleanupBoundingBox() {
 	glDeleteVertexArrays(1, &bound_VAO);
 }
 
-void MeshShaderGL::draw_bounds(ModelData *tempMD, glm::mat4 mainModelMatrix) {
-    // size and position of bounding box
-    GLfloat
-        min_x, max_x,
-        min_y, max_y,
-        min_z, max_z;
-
-    vector<Vertex>* vertices = tempMD->getMesh(0)->getVertices();
-    glm::vec3 pos = vertices->at(0).pos;
-    pos = glm::vec3(mainModelMatrix * glm::vec4(pos, 1.0));
-    min_x = max_x = pos.x;
-    min_y = max_y = pos.y;
-    min_z = max_z = pos.z;
-    for (int i = 0; i < vertices->size(); i++) {
-        pos = vertices->at(i).pos;
-        pos = glm::vec3(mainModelMatrix * glm::vec4(pos, 1.0));
-        if (pos.x < min_x) min_x = pos.x;
-        if (pos.x > max_x) max_x = pos.x;
-        if (pos.y < min_y) min_y = pos.y;
-        if (pos.y > max_y) max_y = pos.y;
-        if (pos.z < min_z) min_z = pos.z;
-        if (pos.z > max_z) max_z = pos.z;
-    }
-    glm::vec3 size = glm::vec3(max_x - min_x, max_y - min_y, max_z - min_z);
-    glm::vec3 center = glm::vec3((min_x + max_x) / 2.0, (min_y + max_y) / 2.0, (min_z + max_z) / 2.0);
-    glm::mat4 transform = glm::translate(glm::mat4(1), center) * glm::scale(glm::mat4(1), size);
-
-    //apply object transformation    
+void MeshShaderGL::draw_bounds(glm::mat4 transform) {
+    //apply transformation    
     glUniformMatrix4fv(modelMatLoc, 1, GL_FALSE, glm::value_ptr(transform));
-
     glBindVertexArray(bound_VAO);
-	glDrawElements(GL_LINE_LOOP, 16, GL_UNSIGNED_INT, (void*)0);
-	glBindVertexArray(0);
+    glDrawElements(GL_LINE_LOOP, 16, GL_UNSIGNED_INT, (void*)0);
+    glBindVertexArray(0);
 }

@@ -4,8 +4,6 @@
 #include "MeshData.hpp"
 #include "TextureData.hpp"
 #include "MaterialData.hpp"
-//#include "ModelGL.hpp"
-//#include "MeshShaderGL.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -16,8 +14,10 @@ private:
 	vector<MeshData*> meshes;
 	vector<MaterialData*> materials;
 	vector<TextureData*> textures;
-	vector<int> matIndices;			// Index of material for given Mesh (# of elements = # of meshes)
+	vector<int> matIndices;
 	string aName;
+
+	glm::mat4 transform; //bounding box
 	
 public:
 	ModelData();
@@ -41,6 +41,8 @@ public:
 	void ModelData::addFileName(string m);
 	string ModelData::getFileName();
 
+	glm::mat4 ModelData::sizeposBB(ModelData* temp, glm::mat4 mainModelMatrix);
+	glm::mat4 ModelData::returnTransform();
 };
 
 #endif

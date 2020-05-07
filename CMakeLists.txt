@@ -29,11 +29,9 @@ set(CMAKE_PREFIX_PATH ${MASTER_DEPEND} ${CMAKE_PREFIX_PATH})
 # - GLEW (static)
 # - GLM
 # - Assimp (static)
-# INTERNALLY INCLUDES -
+# INCLUDES -
 # - irrKlang 1.6.0 - https://www.ambiera.com/irrklang
 # - DearImgui - https://github.com/ocornut/imgui
-# - json.hpp - https://github.com/nlohmann/json
-# - tiny_gltf.h - https://github.com/syoyo/tinygltf
 # - imfilebrowser.h - https://github.com/AirGuanZ/imgui-filebrowser
 # - stb_image
 # - stb_image_write

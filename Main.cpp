@@ -463,7 +463,7 @@ int main(int argc, char **argv) {
 						string modelFilename = fileName;
 						modelData = loadModel(modelFilename);
 
-						//save name of model loaded
+						// save name of model loaded
 						std::string nameForAdding = getFileName(modelFilename);
 						modelData->addFileName(nameForAdding);
 
@@ -477,7 +477,7 @@ int main(int argc, char **argv) {
 							vector<Vertex>* vertices = modelData->getMesh(0)->getVertices();
 							for (int i = 0; i < vertices->size(); i++) {
 								glm::vec3 pos = vertices->at(i).pos;
-								//rescaling
+								// rescaling
 								pos += 1.0;
 								pos /= 2.0;
 								vertices->at(i).color = glm::vec4(pos.x, pos.y, pos.z, 1.0);
@@ -485,11 +485,11 @@ int main(int argc, char **argv) {
 							collide = new Collide(modelData);
 							modelGL = new ModelGL(modelData);
 							anActor = new Actor(modelData, modelGL, collide);
-							//add Actor obj here
+							// add Actor obj here
 							objFiles.push_back(anActor);
 							glClearColor(0.0f, 0.0f, 0.7f, 1.0f);
 							glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-							//load object at 0, 0, 0 coordinates
+							// load object at 0, 0, 0 coordinates
 							modelGL->translate(glm::vec3(0, 0, 0));
 							modelData = NULL;
 							modelGL = NULL;
@@ -519,7 +519,7 @@ int main(int argc, char **argv) {
 				{
 					string fileName = fileDialog.GetSelected().string();
 					ext = GetFilePathExtension(fileName);
-					//if a txt file, parse each line, load models
+					// if a txt file, parse each line, load models
 					if (ext == "txt") {
 						std::ifstream infile(fileName);
 						std::string line;
@@ -529,7 +529,7 @@ int main(int argc, char **argv) {
 							string newObj;
 							string extenS = "../objs/";
 							double x, y, z;
-							//if no more lines or bad line
+							// if no more lines or bad line
 							if (!(iss >> newObj >> x >> y >> z)) {
 								break; 
 							}
@@ -556,13 +556,13 @@ int main(int argc, char **argv) {
 							modelGL = new ModelGL(modelData);
 							collide = new Collide(modelData);
 							anActor = new Actor(modelData, modelGL, collide);
-							//add Actor obj here
+							// add Actor obj here
 							objFiles.push_back(anActor);
 
 							glClearColor(0.0f, 0.0f, 0.7f, 1.0f);
 							glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-							//load object at parsed-in x, y, z coordinates
+							// load object at parsed-in x, y, z coordinates
 							modelGL->translate(glm::vec3(x, y, z));
 							modelData = NULL;
 							modelGL = NULL;
@@ -591,7 +591,7 @@ int main(int argc, char **argv) {
 		shaderBox->setLight(light);
 		shader->activate();
 
-		//cursor ray
+		// cursor ray
 		double x, y;
 		glfwGetCursorPos(window, &x, &y); //get screen coordinates from cursor
 		mousePick->saveCoordX(x);
@@ -599,15 +599,14 @@ int main(int argc, char **argv) {
 		mousePick->updateBufferW(framebufferWidth);
 		mousePick->updateBufferH(framebufferHeight);
 		mousePick->update();
-		//cout << "Current Ray: " << glm::to_string(mousePick->getCurrentRay()) << endl;
 
-		/*/////////////////////////////////////////////////////////////////////////////*//////////FIX
+		/*/////////////////////////////////////////////////////////////////////////////*/
 		int display_w, display_h;
 		glfwGetFramebufferSize(window, &display_w, &display_h);
 		glViewport(0, 0, display_w, display_h);
 		glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		/*Draw the mesh using ModelGL's draw() method (passing in the shader)*/
+		// Draw the mesh using ModelGL's draw() method (passing in the shader)
 		glLineWidth(10.0);
 		if (how_many_objs >= 1) {
 			for (int i = 0; i < objFiles.size(); i++) {
@@ -616,9 +615,12 @@ int main(int argc, char **argv) {
 				shader->setMaterialChoice(materialCh);
 				shader->setShininess(shiny);
 				temp->draw(shader);
-				tempModelData = objFiles[i]->returnModelData();
+				// bounding box
+				tempModelData = objFiles[i]->returnModelData(); //get modeldata
+				tempModelMatrix = temp->getModel(); //get modelmatrix
+				tempTransform = tempModelData->sizeposBB(tempModelData, tempModelMatrix); //get transform (saved in modeldata)
 				shaderBox->activate();
-				shaderBox->draw_bounds(tempModelData, temp->getModel());
+				shaderBox->draw_bounds(tempTransform); //draw bb
 			}
 		}
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

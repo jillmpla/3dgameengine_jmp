@@ -4,7 +4,7 @@ Add a copy of [irrKlang.dll] and [ikpMP3.dll] from libs/irrKlang to the build
 folder for Visual Studio to run/debug with sound/music feature.
 /////////////////////////////////////////////////////////////////////////////*/
 
-//C++
+/*C++*/
 #include <cstdio>
 #include <iostream>
 #include <sstream>
@@ -51,18 +51,14 @@ folder for Visual Studio to run/debug with sound/music feature.
 #include "libs/dearimgui/imstb_rectpack.h"
 #include "libs/dearimgui/imstb_textedit.h"
 #include "libs/dearimgui/imstb_truetype.h"
-/*JSON*/
-#include "libs/json.hpp"
-using json = nlohmann::json;
-/*TinyGLTF*/
-#define TINYGLTF_IMPLEMENTATION
-#include "libs/tiny_gltf.h"
+/*/////////////////////////////////////////////////////////////////////////////*/
 #define STB_IMAGE_IMPLEMENTATION
 #include "libs/stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "libs/stb_image_write.h"
 /*imfilebrowser*/
 #include "libs/imfilebrowser.h"
+/*/////////////////////////////////////////////////////////////////////////////*/
 
 using namespace std;
 
@@ -117,14 +113,11 @@ int materialCh = 0;
 MeshShaderGL *shader;
 MeshShaderGL* shaderBox;
 
-// Create/Get mesh data	
 ModelData* modelData;
 ModelData* tempModelData;
 
-//Create/Get shader data
 ModelGL* modelGL;
 
-//Collider, Actor
 Collide* collide;
 Actor* anActor;
 
@@ -133,13 +126,13 @@ MousePicker* mousePick = new MousePicker(camera);
 ModelGL *temp;
 ModelGL *tempMove;
 
-//Actor objs
 vector<Actor*> objFiles;
-
-//Sound
 vector<Sound*> soundFiles;
 
 bool rightMouseDown = false;
+
+glm::mat4 tempModelMatrix;
+glm::mat4 tempTransform;
 
 string fileNameNew;
 string fileNameNew1;
@@ -161,7 +154,9 @@ bool pauseSound = false;
 bool adjust_specific_sound = false;
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-//function finds file name from file path
+std::string ext;
+
+// Finds file name from file path
 string getFileName(const string& s) {
 
 	char sep = '/';
@@ -178,19 +173,11 @@ string getFileName(const string& s) {
 	return("");
 }
 
-//tinyglft///////////////////////////////////////////////////////////////////////
 static std::string GetFilePathExtension(const std::string& FileName) {
 	if (FileName.find_last_of(".") != std::string::npos)
 		return FileName.substr(FileName.find_last_of(".") + 1);
 	return "";
 }
-
-bool ret = false;
-tinygltf::Model model;
-tinygltf::TinyGLTF loader;
-std::string errp;
-std::string warn;
-std::string ext;
 
 /*///////////////////////////////////////////////////////////////////////////////
 FUNCTIONS - GLFW Callbacks
@@ -309,7 +296,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			}
 			break;
 
-		//camera keys
+		// Camera keys
 		case GLFW_KEY_W:
 			camera->forward(CAMERA_WALK_SPEED);
 			break;
@@ -326,7 +313,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			camera->strafeRight(-CAMERA_WALK_SPEED);
 			break;
 
-		//extra
+		// Extra
 		case GLFW_KEY_C:
 			if (light->getIsPointLight()) {
 				light->setIsPointLight(false);
@@ -382,7 +369,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 // GLFW callback mouse position
 static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos) {
-	if (rightMouseDown == true) {
+	/*if (rightMouseDown == true) {
 		double v, w;
 		glfwGetCursorPos(window, &v, &w); //get screen coordinates from cursor
 		mousePick->saveCoordX(v);
@@ -392,24 +379,41 @@ static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos
 		mousePick->update();
 		glm::vec3 currentRayAtTheMoment = mousePick->getCurrentRay(); //mouse ray
 		if (how_many_objs >= 1) {
-			/*for (int i = 0; i < objFiles.size(); i++) {
-				temp = objFiles[i]->returnModelGL();
-				glm::mat4 modelMatrixForTest = temp->getModel(); //object
-				glm::vec3 localRay = glm::vec3(glm::inverse(modelMatrixForTest) * glm::vec4(currentRayAtTheMoment, 0));
-				// if the mouse ray is within the object
-				if (currentRayAtTheMoment.x > modelMatrixForTest[0].x && currentRayAtTheMoment.y > modelMatrixForTest[2].y)
-				{
-					if (currentRayAtTheMoment.x < modelMatrixForTest[2].x && currentRayAtTheMoment.y < modelMatrixForTest[2].y)
-					{
-						// then drag by chaning square coordinates relative to mouse
-						sqr->drag(sqr, mouse);
-						glutPostRedisplay();
-					}
-				}
-			}*/
-			//////////////////////////////////////////////////////// try snapping camera to object
-			temp = objFiles[0]->returnModelGL();
-			temp->translate(currentRayAtTheMoment);
+			for (int i = 0; i < objFiles.size(); i++) {
+				ModelData* tempModelDataM = objFiles[i]->returnModelData(); //get modeldata
+				glm::mat4 hereTrans = tempModelDataM->returnTransform(); //get transform bounding box
+				//temp->translate(currentRayAtTheMoment);
+			}
+		}*/
+
+	if (rightMouseDown == true) {
+		GLdouble model[44];
+		GLdouble proj[44];
+		GLint view[4];
+		GLdouble togo_x, togo_y, togo_z;
+
+		double x, y;
+		glfwGetCursorPos(window, &x, &y); //get screen coordinates from cursor
+
+		glGetDoublev(GL_MODELVIEW_MATRIX, model); //modelgl
+		glGetDoublev(GL_PROJECTION_MATRIX, proj); //camera
+		glGetIntegerv(GL_VIEWPORT, view); //camera
+
+		if (how_many_objs >= 1) {
+			for (int i = 0; i < objFiles.size(); i++) {
+				ModelGL* tempforModelGL1 = objFiles[i]->returnModelGL();
+				/*glm::mat4 model = tempforModelGL1->getModel();
+				glm::mat4 proj = camera->getProjectionMatrix();
+				glm::mat4 view = camera->getViewMatrix();*/
+
+				gluProject((GLdouble)x, (GLdouble)y, 0.0, model, proj, view, &togo_x, &togo_y, &togo_z);
+				gluUnProject((GLdouble)x, (GLdouble)y, togo_z, model, proj, view, &togo_x, &togo_y, &togo_z);
+				//togo_y = -togo_y;
+				glm::vec3 whatToTranslateBy = glm::vec3(togo_x, togo_y, togo_z);
+
+
+				tempforModelGL1->translate(whatToTranslateBy);
+			}
 		}
 	}
 }
