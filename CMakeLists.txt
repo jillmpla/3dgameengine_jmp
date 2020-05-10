@@ -31,7 +31,7 @@ set(CMAKE_PREFIX_PATH ${MASTER_DEPEND} ${CMAKE_PREFIX_PATH})
 # - Assimp (static)
 # INCLUDES -
 # - irrKlang 1.6.0 - https://www.ambiera.com/irrklang
-# - DearImgui - https://github.com/ocornut/imgui
+# - Dear Imgui - https://github.com/ocornut/imgui
 # - imfilebrowser.h - https://github.com/AirGuanZ/imgui-filebrowser
 # - stb_image
 # - stb_image_write
