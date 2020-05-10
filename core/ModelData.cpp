@@ -123,13 +123,21 @@ glm::mat4 ModelData::sizeposBB(ModelData* temp, glm::mat4 mainModelMatrix) {
 		if (pos.z > max_z) max_z = pos.z;
 	}
 
-	glm::vec3 size = glm::vec3(max_x - min_x, max_y - min_y, max_z - min_z);
-	glm::vec3 center = glm::vec3((min_x + max_x) / 2.0, (min_y + max_y) / 2.0, (min_z + max_z) / 2.0);
-	transform = glm::translate(glm::mat4(1), center) * glm::scale(glm::mat4(1), size);
+	sizeBB = glm::vec3(max_x - min_x, max_y - min_y, max_z - min_z);
+	centerBB = glm::vec3((min_x + max_x) / 2.0, (min_y + max_y) / 2.0, (min_z + max_z) / 2.0);
+	transform = glm::translate(glm::mat4(1), centerBB) * glm::scale(glm::mat4(1), sizeBB);
 
 	return transform;
 }
 
 glm::mat4 ModelData::returnTransform() {
 	return transform;
+}
+
+glm::vec3 ModelData::getSizeBB() {
+	return sizeBB;
+}
+
+glm::vec3 ModelData::getCenterBB() {
+	return centerBB;
 }

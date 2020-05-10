@@ -31,4 +31,6 @@ public:
 	void strafeRight(float distance);
 
 	float getNearPlane();
+
+	glm::vec3 Camera::getEye();
 };

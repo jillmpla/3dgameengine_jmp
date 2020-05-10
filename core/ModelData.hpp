@@ -18,6 +18,8 @@ private:
 	string aName;
 
 	glm::mat4 transform; //bounding box
+	glm::vec3 sizeBB;
+	glm::vec3 centerBB;
 	
 public:
 	ModelData();
@@ -43,6 +45,8 @@ public:
 
 	glm::mat4 ModelData::sizeposBB(ModelData* temp, glm::mat4 mainModelMatrix);
 	glm::mat4 ModelData::returnTransform();
+	glm::vec3 ModelData::getCenterBB();
+	glm::vec3 ModelData::getSizeBB();
 };
 
 #endif

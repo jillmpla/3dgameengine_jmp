@@ -16,6 +16,7 @@ glm::vec3 MousePicker::getCurrentRay() {
 //needs to be called every frame
 void MousePicker::update() {
 	viewMatriX = camera->getViewMatrix();
+	projMatriX = camera->getProjectionMatrix();
 	currentRay = calculateMouseRay();
 }
 
@@ -52,6 +53,7 @@ glm::vec3 MousePicker::calculateMouseRay() {
 	//std::cout << "EYE: " << eyeSpaceCoords.x << " " << eyeSpaceCoords.y << " " << eyeSpaceCoords.z << std::endl;
 	//world space
 	glm::vec3 worldSpaceRay = toWorldCoor(eyeSpaceCoords);
+	worldSpaceRay.z = -worldSpaceRay.z;
 	return worldSpaceRay;
 }
 
@@ -73,8 +75,8 @@ glm::vec3 MousePicker::toWorldCoor(glm::vec4 eyeSpaceCoords) {
 }
 
 glm::vec2 MousePicker::getNormalizedDevCoor(double x1, double y1) {
-	double x2 = (2.0f * x1) / width - 1;
-	double y2 = (2.0f * y1) / height - 1.0f;
+	double x2 = (2.0f * x1) / ((float)width) - 1.0f;
+	double y2 = (2.0f * y1) / ((float)height) - 1.0f;
 	glm::vec2 newVec = glm::vec2(x2, -y2);
 	return newVec;
 }

@@ -89,3 +89,7 @@ void Camera::strafeRight(float distance) {
 float Camera::getNearPlane() {
 	return nearPlane;
 }
+
+glm::vec3 Camera::getEye() {
+	return eye;
+}

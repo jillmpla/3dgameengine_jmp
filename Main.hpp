@@ -90,9 +90,12 @@ const float TRANSLATION_INC = 0.1;
 const float CAMERA_WALK_SPEED = .1f;
 const float CAMERA_ROTATE_SPEED = 30.0f;
 
-glm::vec3 eye1 = glm::vec3(-2, 2, 2);
-glm::vec3 lookAt1 = glm::vec3(1, 0, 0);
+//glm::vec3 eye1 = glm::vec3(-2, 2, 2);
+//glm::vec3 lookAt1 = glm::vec3(1, 0, 0);
 glm::vec3 up1 = glm::vec3(0, 1, 0);
+glm::vec3 eye1 = glm::vec3(0, 0, 1);
+glm::vec3 lookAt1 = glm::vec3(0, 0, 0);
+
 float fov1 = 60.0f;
 float nearPlane1 = 0.01f;
 float farPlane1 = 30.0f;
@@ -367,9 +370,56 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	}
 }
 
+//Code modified from:
+//https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
+bool intersect(glm::vec3 rayOrg, glm::vec3 rayDir, glm::vec3 centerTemp, glm::vec3 sizeTemp)
+{
+	glm::vec3 min;
+	glm::vec3 max;
+	min = centerTemp - sizeTemp/2.0f;
+	max = centerTemp + sizeTemp/2.0f;
+
+	cout << "min" << glm::to_string(min) << "max" << glm::to_string(max) << endl;
+
+	float tmin = (min.x - rayOrg.x) / rayDir.x;
+	float tmax = (max.x - rayOrg.x) / rayDir.x;
+
+	if (tmin > tmax) swap(tmin, tmax);
+
+	float tymin = (min.y - rayOrg.y) / rayDir.y;
+	float tymax = (max.y - rayOrg.y) / rayDir.y;
+
+	if (tymin > tymax) swap(tymin, tymax);
+
+	if ((tmin > tymax) || (tymin > tmax))
+		return false;
+
+	if (tymin > tmin)
+		tmin = tymin;
+
+	if (tymax < tmax)
+		tmax = tymax;
+
+	float tzmin = (min.z - rayOrg.z) / rayDir.z;
+	float tzmax = (max.z - rayOrg.z) / rayDir.z;
+
+	if (tzmin > tzmax) swap(tzmin, tzmax);
+
+	if ((tmin > tzmax) || (tzmin > tmax))
+		return false;
+
+	if (tzmin > tmin)
+		tmin = tzmin;
+
+	if (tzmax < tmax)
+		tmax = tzmax;
+
+	return true;
+}
+
 // GLFW callback mouse position
 static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos) {
-	/*if (rightMouseDown == true) {
+	if (rightMouseDown == true) {
 		double v, w;
 		glfwGetCursorPos(window, &v, &w); //get screen coordinates from cursor
 		mousePick->saveCoordX(v);
@@ -378,15 +428,29 @@ static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos
 		mousePick->updateBufferH(framebufferHeight);
 		mousePick->update();
 		glm::vec3 currentRayAtTheMoment = mousePick->getCurrentRay(); //mouse ray
+		currentRayAtTheMoment = glm::normalize(currentRayAtTheMoment);
+
+		glm::vec3 currentEye = camera->getEye();
 		if (how_many_objs >= 1) {
 			for (int i = 0; i < objFiles.size(); i++) {
 				ModelData* tempModelDataM = objFiles[i]->returnModelData(); //get modeldata
-				glm::mat4 hereTrans = tempModelDataM->returnTransform(); //get transform bounding box
+				glm::vec3 centerTemp = tempModelDataM->getCenterBB();
+				glm::vec3 sizeTemp = tempModelDataM->getSizeBB();
+				bool hitObject = intersect(currentEye, currentRayAtTheMoment, centerTemp, sizeTemp);
+
+				cout << i << " " << hitObject << endl;
+				cout << i << " " << glm::to_string(currentRayAtTheMoment) << endl;
+				cout << i << " " << glm::to_string(currentEye) << endl;
+				cout << i << "CENTERTEMP" << glm::to_string(centerTemp) << endl;
+				cout << i << " " << glm::to_string(sizeTemp) << endl;
+				cout << i << "DONEEEEEEEEEEEEEEEEE" << endl;
+				
 				//temp->translate(currentRayAtTheMoment);
 			}
-		}*/
+		}
+	}
 
-	if (rightMouseDown == true) {
+	/*if (rightMouseDown == true) {
 		GLdouble model[44];
 		GLdouble proj[44];
 		GLint view[4];
@@ -404,18 +468,17 @@ static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos
 				ModelGL* tempforModelGL1 = objFiles[i]->returnModelGL();
 				/*glm::mat4 model = tempforModelGL1->getModel();
 				glm::mat4 proj = camera->getProjectionMatrix();
-				glm::mat4 view = camera->getViewMatrix();*/
+				glm::mat4 view = camera->getViewMatrix();
 
 				gluProject((GLdouble)x, (GLdouble)y, 0.0, model, proj, view, &togo_x, &togo_y, &togo_z);
 				gluUnProject((GLdouble)x, (GLdouble)y, togo_z, model, proj, view, &togo_x, &togo_y, &togo_z);
-				//togo_y = -togo_y;
+				togo_y = -togo_y;
+
 				glm::vec3 whatToTranslateBy = glm::vec3(togo_x, togo_y, togo_z);
-
-
 				tempforModelGL1->translate(whatToTranslateBy);
 			}
 		}
-	}
+	}*/
 }
 
 // GLFW callback mouse button
