@@ -45,12 +45,10 @@ glm::vec3 MousePicker::calculateMouseRay() {
 	double x1 = x;
 	double y1 = y;
 	glm::vec2 normalCoords = getNormalizedDevCoor(x1, y1);
-	//std::cout << "XY: " << normalCoords.x << " " << normalCoords.y << std::endl;
 	//clip space
 	clipCoords = glm::vec4(normalCoords.x, normalCoords.y, -1.0f, 1.0f);
 	//eye space
 	glm::vec4 eyeSpaceCoords = toEye(clipCoords);
-	//std::cout << "EYE: " << eyeSpaceCoords.x << " " << eyeSpaceCoords.y << " " << eyeSpaceCoords.z << std::endl;
 	//world space
 	glm::vec3 worldSpaceRay = toWorldCoor(eyeSpaceCoords);
 	worldSpaceRay.z = -worldSpaceRay.z;
@@ -70,7 +68,6 @@ glm::vec3 MousePicker::toWorldCoor(glm::vec4 eyeSpaceCoords) {
 	glm::mat4 invView = glm::inverse(viewMatriX);
 	glm::vec4 rWorld = invView * eyeSpaceCoords;
 	glm::vec3 finalWorld = glm::vec3(rWorld.x, rWorld.y, rWorld.z);
-	//glm::vec3 normalfinalWorld = glm::normalize(finalWorld);
 	return finalWorld;
 }
 
@@ -80,19 +77,4 @@ glm::vec2 MousePicker::getNormalizedDevCoor(double x1, double y1) {
 	glm::vec2 newVec = glm::vec2(x2, -y2);
 	return newVec;
 }
-
-/*
-void MousePicker::intersectionXYPlane(float *worldPos) {
-	float s = -clickPosInWorld.z / direction.z;
-	worldPos[0] = clickPosInWorld.x + direction.x * s;
-	worldPos[1] = clickPosInWorld.y + direction.y * s;
-	worldPos[2] = 0;
-}
-
-glm::vec3 MousePicker::getClickPosInWorld() {
-	return clickPosInWorld;
-}
-glm::vec3 MousePicker::getDirection() {
-	return direction;
-}*/
 

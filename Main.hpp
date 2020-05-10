@@ -90,8 +90,6 @@ const float TRANSLATION_INC = 0.1;
 const float CAMERA_WALK_SPEED = .1f;
 const float CAMERA_ROTATE_SPEED = 30.0f;
 
-//glm::vec3 eye1 = glm::vec3(-2, 2, 2);
-//glm::vec3 lookAt1 = glm::vec3(1, 0, 0);
 glm::vec3 up1 = glm::vec3(0, 1, 0);
 glm::vec3 eye1 = glm::vec3(0, 0, 1);
 glm::vec3 lookAt1 = glm::vec3(0, 0, 0);
@@ -370,8 +368,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	}
 }
 
-//Code modified from:
+//Code modified from:////////////////////////////////////////////////////////////////////////////////////////////////////////
 //https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool intersect(glm::vec3 rayOrg, glm::vec3 rayDir, glm::vec3 centerTemp, glm::vec3 sizeTemp)
 {
 	glm::vec3 min;
@@ -417,7 +416,13 @@ bool intersect(glm::vec3 rayOrg, glm::vec3 rayDir, glm::vec3 centerTemp, glm::ve
 	return true;
 }
 
-// GLFW callback mouse position
+//------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------
+// GLFW callback mouse position ------------> Last functionality still a work in progress. <------------
+//------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------
 static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos) {
 	if (rightMouseDown == true) {
 		double v, w;
@@ -437,48 +442,9 @@ static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos
 				glm::vec3 centerTemp = tempModelDataM->getCenterBB();
 				glm::vec3 sizeTemp = tempModelDataM->getSizeBB();
 				bool hitObject = intersect(currentEye, currentRayAtTheMoment, centerTemp, sizeTemp);
-
-				cout << i << " " << hitObject << endl;
-				cout << i << " " << glm::to_string(currentRayAtTheMoment) << endl;
-				cout << i << " " << glm::to_string(currentEye) << endl;
-				cout << i << "CENTERTEMP" << glm::to_string(centerTemp) << endl;
-				cout << i << " " << glm::to_string(sizeTemp) << endl;
-				cout << i << "DONEEEEEEEEEEEEEEEEE" << endl;
-				
-				//temp->translate(currentRayAtTheMoment);
 			}
 		}
 	}
-
-	/*if (rightMouseDown == true) {
-		GLdouble model[44];
-		GLdouble proj[44];
-		GLint view[4];
-		GLdouble togo_x, togo_y, togo_z;
-
-		double x, y;
-		glfwGetCursorPos(window, &x, &y); //get screen coordinates from cursor
-
-		glGetDoublev(GL_MODELVIEW_MATRIX, model); //modelgl
-		glGetDoublev(GL_PROJECTION_MATRIX, proj); //camera
-		glGetIntegerv(GL_VIEWPORT, view); //camera
-
-		if (how_many_objs >= 1) {
-			for (int i = 0; i < objFiles.size(); i++) {
-				ModelGL* tempforModelGL1 = objFiles[i]->returnModelGL();
-				/*glm::mat4 model = tempforModelGL1->getModel();
-				glm::mat4 proj = camera->getProjectionMatrix();
-				glm::mat4 view = camera->getViewMatrix();
-
-				gluProject((GLdouble)x, (GLdouble)y, 0.0, model, proj, view, &togo_x, &togo_y, &togo_z);
-				gluUnProject((GLdouble)x, (GLdouble)y, togo_z, model, proj, view, &togo_x, &togo_y, &togo_z);
-				togo_y = -togo_y;
-
-				glm::vec3 whatToTranslateBy = glm::vec3(togo_x, togo_y, togo_z);
-				tempforModelGL1->translate(whatToTranslateBy);
-			}
-		}
-	}*/
 }
 
 // GLFW callback mouse button
