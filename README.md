@@ -1,5 +1,5 @@
+<p align="center">
 # Beary: 3D Game Engine
-
 <table style="width:100%">
   <tr>
     <th>Dependencies:</th>
@@ -36,4 +36,4 @@
 <br>
 <b>NOTE:</b>
 Add a copy of [irrKlang.dll] and [ikpMP3.dll] from libs/irrKlang to
-the build folder for Visual Studio to run/debug with sound/music feature.
+the build folder for Visual Studio to run/debug with sound functionality.
