@@ -91,8 +91,10 @@ const float CAMERA_WALK_SPEED = .1f;
 const float CAMERA_ROTATE_SPEED = 30.0f;
 
 glm::vec3 up1 = glm::vec3(0, 1, 0);
-glm::vec3 eye1 = glm::vec3(0, 0, 1);
-glm::vec3 lookAt1 = glm::vec3(0, 0, 0);
+//glm::vec3 eye1 = glm::vec3(0, 0, 1);
+//glm::vec3 lookAt1 = glm::vec3(0, 0, 0);
+glm::vec3 eye1 = glm::vec3(-2, 2, 2);
+glm::vec3 lookAt1 = glm::vec3(1, 0, 0);
 
 float fov1 = 60.0f;
 float nearPlane1 = 0.01f;
@@ -425,7 +427,7 @@ bool intersect(glm::vec3 rayOrg, glm::vec3 rayDir, glm::vec3 centerTemp, glm::ve
 //------------------------------------------------------------------------------------------------------------------
 static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos) {
 	if (rightMouseDown == true) {
-		double v, w;
+		/*double v, w;
 		glfwGetCursorPos(window, &v, &w); //get screen coordinates from cursor
 		mousePick->saveCoordX(v);
 		mousePick->saveCoordY(w);
@@ -443,7 +445,7 @@ static void mouse_position_callback(GLFWwindow* window, double xpos, double ypos
 				glm::vec3 sizeTemp = tempModelDataM->getSizeBB();
 				bool hitObject = intersect(currentEye, currentRayAtTheMoment, centerTemp, sizeTemp);
 			}
-		}
+		}*/
 	}
 }
 
