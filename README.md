@@ -33,10 +33,7 @@
   </tr>
 </table>
 
-/////////////////////////////////////////////////////////////////////////////
 <br>
-<b><center>NOTE:</b><br></center>
+<b>NOTE:</b>
 Add a copy of [irrKlang.dll] and [ikpMP3.dll] from libs/irrKlang to
-the build folder for Visual Studio to run/debug with sound/music feature.<br>
-/////////////////////////////////////////////////////////////////////////////
-
+the build folder for Visual Studio to run/debug with sound/music feature.
