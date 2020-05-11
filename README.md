@@ -38,4 +38,5 @@
 Add a copy of [irrKlang.dll] and [ikpMP3.dll] from libs/irrKlang to
 the build folder for Visual Studio to run/debug with sound functionality.
 <br>
+<br>
 Please see the file <b>"Beary - Building a 3D Game Engine with OpenGL.pdf"<b> for further information on the project.
