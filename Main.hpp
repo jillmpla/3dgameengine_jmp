@@ -91,8 +91,6 @@ const float CAMERA_WALK_SPEED = .1f;
 const float CAMERA_ROTATE_SPEED = 30.0f;
 
 glm::vec3 up1 = glm::vec3(0, 1, 0);
-//glm::vec3 eye1 = glm::vec3(0, 0, 1);
-//glm::vec3 lookAt1 = glm::vec3(0, 0, 0);
 glm::vec3 eye1 = glm::vec3(-2, 2, 2);
 glm::vec3 lookAt1 = glm::vec3(1, 0, 0);
 
